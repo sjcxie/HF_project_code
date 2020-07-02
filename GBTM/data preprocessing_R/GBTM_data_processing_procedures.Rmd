@@ -1,0 +1,167 @@
+---
+title: "GBTM_data_processing_procedures"
+author: "Jinchen Xie"
+date: "6/15/2020"
+output: html_document
+---
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(echo=FALSE, warning=FALSE, message=FALSE)
+library(tidyverse)
+library(knitr)
+library(readxl)
+library(openxlsx)
+library(data.table)
+library(Hmisc)
+```
+
+
+# import admission dataset
+
+The dataset used is admission withou 30% NA tolerance. 
+```{r}
+admission_30NA <- read_excel("~/Desktop/datasets/processed/Filtered Attributes Admission.xlsx", sheet = 'NA2030_filtered_admission')
+
+admission_proc <- 
+  select(admission_30NA, -ends_with("_DAYS")) %>% 
+  select(rID, CABG:STVR, PCI: CRT_IMPLANT)
+```
+
+# only >=3 readmissions
+```{r}
+# readmission_counts <- admission_lab %>% group_by(rID) %>% tally()
+# sub_3to15_rID <- readmission_counts[which(readmission_counts$n>2),]$rID
+# admission_lab.3to15 <- admission_lab[which(admission_lab$rID %in% sub_3to15_rID),]
+```
+
+
+```{r}
+admission_proc.3to15 <- admission_proc[which(admission_proc$rID %in% patients_id),]
+
+summary(admission_proc.3to15[,c(-1)])
+
+
+colSums(admission_proc.3to15[,c(-1)])
+```
+
+```{r}
+col.list <- colnames(admission_proc.3to15)[c(-1)]
+for (val in col.list){
+  cat(val,": ", length(unique(admission_flags.3to15[which(admission_proc.3to15[[val]]==1),]$rID)), "   ", length(unique(admission_proc.3to15[which(admission_proc.3to15[[val]]==1),]$rID))/length(unique(admission_proc.3to15$rID)),"\n")
+}
+```
+
+
+
+**How many/what percentage of patients got each procedure?**
+
+```{r}
+patients.procedures <- admission_lab.3to15 %>%  group_by(rID) %>% summarise(n.cabg=sum(CABG), n.tavr=sum(TAVR), 
+                                                                            n.mech=sum(SAVR_MECH),
+                                                     n.bio=sum(SAVR_BIO), n.surg=sum(SURG_AO_GRFT),
+                                                     n.endo=sum(ENDO_AO_GRFT), n.vlv=sum(AO_VLV_REPAIR),
+                                                     n.smvr=sum(SMVR), n.spvr=sum(SPVR), n.stvr=sum(STVR))
+temp.list <- c("n.cabg", "n.tavr", "n.mech","n.bio","n.surg","n.endo","n.vlv","n.smvr","n.spvr","n.stvr")
+for (var in temp.list){
+  cat(var, ": ", sum(patients.procedures[[var]]),"\n")
+}
+```
+
+
+
+
+
+
+# Reshape for traj model input
+
+```{r}
+
+generate_col_names <- function(measure_name, patients_id){
+  col_names <- c()
+  for (val in patients_id){
+    col_names <- append(col_names, paste(measure_name, val, sep="_"))
+  }
+ return(col_names) 
+}
+
+measurement_df <- function(orginial_df, new_df, measure_name){
+  col.names <- generate_col_names(measure_name, patients_id)
+  names(new_df) <- col.names
+  
+  for (val in seq(1, length(unique(patients_id)))){
+    temp_c <- orginial_df[[measure_name]][which(orginial_df$rID == patients_id[val])]
+    new_df[[col.names[val]]] <- c(temp_c, rep(NA, nrow(new_df)-length(temp_c)))
+  }
+  
+  return(new_df)
+}
+
+change_col_names <- function(measure_name){
+  col_names <- c()
+  for (val in seq(1,15)){
+    col_names <- append(col_names, paste(measure_name, val, sep="_"))
+  }
+  return(col_names)
+}
+```
+
+## number of readmissions
+```{r}
+time.df <- data.frame(matrix(ncol = length(patients_id), nrow = 15))
+names(time.df) <- generate_col_names('T', patients_id)
+
+for (val in seq(1, length(patients_id))){
+    time.df[[names(time.df)[val]]] <- seq(1,15)
+}
+
+time.df.t <- transpose(time.df)
+names(time.df.t) <- change_col_names('T')
+
+```
+
+## PCI
+```{r}
+# wbc_ob <- complete.labs.3to15 %>% select(rID, WBC)
+pci.df <- data.frame(matrix(ncol = length(unique(admission_proc.3to15$rID)), nrow = 15))
+
+pci.df <- measurement_df(orginial_df = admission_proc.3to15, new_df = pci.df, measure_name = 'PCI')
+
+pci.df.t <- transpose(pci.df)
+
+names(pci.df.t) <- change_col_names('PCI')
+```
+
+
+## ICD_IMPLANT
+```{r}
+# wbc_ob <- complete.labs.3to15 %>% select(rID, WBC)
+icd.df <- data.frame(matrix(ncol = length(unique(admission_proc.3to15$rID)), nrow = 15))
+
+icd.df <- measurement_df(orginial_df = admission_proc.3to15, new_df = icd.df, measure_name = 'ICD_IMPLANT')
+
+icd.df.t <- transpose(icd.df)
+
+names(icd.df.t) <- change_col_names('ICD_IMPLANT')
+```
+
+
+##BIV_ICD_IMPLANT
+```{r}
+# wbc_ob <- complete.labs.3to15 %>% select(rID, WBC)
+biv.icd.df <- data.frame(matrix(ncol = length(unique(admission_proc.3to15$rID)), nrow = 15))
+
+biv.icd.df <- measurement_df(orginial_df = admission_proc.3to15, new_df = biv.icd.df, measure_name = 'BIV_ICD_IMPLANT')
+
+biv.icd.df.t <- transpose(biv.icd.df)
+
+names(biv.icd.df.t) <- change_col_names('BIV_ICD_IMPLANT')
+```
+
+
+# save dataset
+
+
+```{r}
+combined.procedure.time <- cbind(patients_id, pci.df.t, icd.df.t, biv.icd.df.t, time.df.t)
+write.xlsx(combined.procedure.time, '~/Desktop/datasets/processed/GBTM_data/procedure gbtm data.xlsx', col.names = TRUE, row.names = FALSE)
+```

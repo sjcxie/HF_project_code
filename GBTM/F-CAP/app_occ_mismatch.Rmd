@@ -1,0 +1,101 @@
+---
+title: "APP, OCC, Mismatch analysis"
+output: html_notebook
+---
+
+```{r global_options, include=FALSE}
+
+knitr::opts_chunk$set(echo=FALSE, warning=FALSE, message=FALSE)
+library(readxl)
+library(openxlsx)
+library(data.table)
+```
+
+
+# import data
+```{r}
+df <- read_excel("~/Desktop/trial save.xlsx", sheet="Sheet1")
+```
+
+
+# extract BIC
+```{r}
+bic <- df$bic[1]
+```
+
+
+```{r}
+groups <- sort(unique(df$`_traj_Group`))
+# create dataframe for storage
+prob_df <- data.frame("avePP"=numeric(length(groups)),
+        row.names=groups)
+        # "avePPm"=numeric(length(groups)),
+        # "OCC"=numeric(length(groups)), "OCCm"=numeric(length(groups)),
+        # "mis"=numeric(length(groups)), "mism"=numeric(length(groups)),
+        # "SD"=numeric(length(groups)), "SDm"=numeric(length(groups)),
+        # "smallAss"=numeric(length(groups)),
+        # "smallEst"=numeric(length(groups)), 
+prob_df.2 <- data.frame("XinGroup"=numeric(length(groups)),
+        row.names=groups)
+
+group_probs <- vector(mode="list", length(groups))
+# group_probs <- rep(0, length(groups))
+# n_members <- rep(0, length(groups))
+
+# find posterior probabilities for each group
+for (row in 1:nrow(df)){
+  g <- df[[row, "_traj_Group"]]
+  group_probs[[g]] <- c(group_probs[[g]], df[[row, paste0("_traj_ProbG", g)]])
+  # n_members[g] <- n_members[g] + 1
+}
+
+
+for (group in groups){
+  # calculate APPA
+  prob_df[group, "avePP"] <- mean(group_probs[[group]], na.rm=TRUE)
+  prob_df.2[group, "XinGroup"] <- length(group_probs[[group]])/nrow(df)
+  # prob_df[toString(group), "avePPm"] <- min(group_probs[[group]], na.rm=TRUE)
+}
+
+prob_df <- t(prob_df)
+prob_df.2 <- t(prob_df.2)
+prob_df <- cbind(bic, prob_df, prob_df.2)
+```
+
+
+```{r}
+write.xlsx(prob_df, '~/Desktop/app_occ.xlsx', col.names = TRUE, row.names = FALSE)
+```
+
+
+```{r}
+traj.na.1 <- c()
+traj.na.2 <- c()
+traj.na.3 <- c()
+traj.na.13 <- c()
+traj.na.14 <- c()
+traj.na.15 <- c()
+mem <- vector("list", length = length(unique(df$`_traj_Group`)))
+for (group in groups){
+  mem[[group]] <- df$patientsid[which(df$`_traj_Group`== group)]
+
+  group.lab <- combined.labs.time[which(combined.labs.time$patients.id %in% mem[[group]]),] 
+  traj.na.1 <- c(traj.na.1, dim(group.lab[which(is.na(group.lab$EGFR_1)),])[1]/length(mem[[group]]))
+  traj.na.2 <- c(traj.na.2, dim(group.lab[which(is.na(group.lab$EGFR_2)),])[1]/length(mem[[group]]))
+  traj.na.3 <- c(traj.na.3, dim(group.lab[which(is.na(group.lab$EGFR_3)),])[1]/length(mem[[group]]))
+  traj.na.13 <- c(traj.na.13, dim(group.lab[which(is.na(group.lab$EGFR_13)),])[1]/length(mem[[group]]))
+  traj.na.14 <- c(traj.na.14, dim(group.lab[which(is.na(group.lab$EGFR_14)),])[1]/length(mem[[group]]))
+  traj.na.15 <- c(traj.na.15, dim(group.lab[which(is.na(group.lab$EGFR_15)),])[1]/length(mem[[group]]))
+}
+cat(traj.na.1,"\n\n", traj.na.2, 
+    "\n\n", traj.na.3, 
+    "\n\n", traj.na.13, 
+    "\n\n", traj.na.14, 
+    "\n\n", traj.na.15)
+```
+
+
+
+
+
+

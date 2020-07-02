@@ -1,0 +1,66 @@
+------------------------------------------------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  /Users/jinchenxie/Documents/GitHub/HF_project_code/GBTM/eg adding covariates.log
+  log type:  text
+ opened on:  25 Jun 2020, 14:42:53
+
+. traj, var(K_*) indep(T_*) model(cnorm) min(1.5) max(8.8) order(0 1 0 0 2) risk(TOBACCO_Never)
+ 
+==== traj stata plugin ====  Jones BL  Nagin DS,  build: May 12 2020
+ 
+1468 observations read.
+1468 observations used in the trajectory model.
+ 
+                        Maximum Likelihood Estimates
+                        Model: Censored Normal (cnorm)
+
+                                       Standard       T for H0:
+ Group   Parameter        Estimate        Error     Parameter=0   Prob > |T|
+ 
+ 1       Intercept         3.47444      0.13103          26.516       0.0000
+ 
+ 2       Intercept         4.13240      0.03224         128.174       0.0000
+         Linear            0.02267      0.00358           6.338       0.0000
+ 
+ 3       Intercept         3.91956      0.04331          90.508       0.0000
+ 
+ 4       Intercept         4.88969      0.04442         110.087       0.0000
+ 
+ 5       Intercept         3.62690      0.17120          21.185       0.0000
+         Linear            0.62264      0.06304           9.877       0.0000
+         Quadratic        -0.03528      0.00433          -8.157       0.0000
+ 
+         Sigma             0.60258      0.00458         131.474       0.0000
+ 
+  Group membership
+ 
+ 1       Baseline         (0.00000)           .               .            . 
+ 
+ 2       Constant          2.76242      0.81177           3.403       0.0007
+         TOBACCO_Neve      0.25550      0.69023           0.370       0.7113
+ 
+ 3       Constant          2.58913      0.68293           3.791       0.0002
+         TOBACCO_Neve      0.11943      0.77589           0.154       0.8777
+ 
+ 4       Constant          1.00537      0.78185           1.286       0.1985
+         TOBACCO_Neve     -0.02817      0.76627          -0.037       0.9707
+ 
+ 5       Constant         -0.79284      0.80036          -0.991       0.3219
+         TOBACCO_Neve      0.97989      0.87036           1.126       0.2603
+ 
+ BIC= -9845.94 (N=9952)  BIC= -9829.67 (N=1468)  AIC= -9784.69  ll=  -9767.69
+
+. drop bic
+
+. gen bic = e(BIC_n_subjects)
+
+. export excel patientsid _traj_ProbG1 _traj_ProbG2 _traj_ProbG3 _traj_ProbG4 _traj_ProbG5 _traj_Group bic using "/Users/jinchenxie/Desktop/tria
+> l save.xlsx", sheetreplace firstrow(variables) keepcellfmt
+file /Users/jinchenxie/Desktop/trial save.xlsx saved
+
+. log close
+      name:  <unnamed>
+       log:  /Users/jinchenxie/Documents/GitHub/HF_project_code/GBTM/eg adding covariates.log
+  log type:  text
+ closed on:  25 Jun 2020, 14:45:56
+------------------------------------------------------------------------------------------------------------------------------------------------

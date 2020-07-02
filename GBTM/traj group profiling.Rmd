@@ -1,0 +1,122 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(echo=FALSE, warning=FALSE, message=FALSE)
+library(readxl)
+library(tidyverse)
+```
+
+
+# import data
+```{r}
+df <- read_excel("~/Desktop/trial save.xlsx", sheet="Sheet1")
+baseline.df <- read_excel('~/Desktop/datasets/processed/GBTM_data/Filtered Baseline imputed.xlsx', sheet = 'Sheet 1')
+admission.df <- read_excel("/Users/jinchenxie/Desktop/datasets/processed/Data_v1.xlsx", sheet = "admission_all")
+static.features <- read_excel("~/Desktop/datasets/processed/Static Characteristics.xlsx", sheet = 'static')
+```
+
+# Add "# of admissions" and "# of 30-day readmissions" labels
+
+```{r}
+labels.df.full <- admission.df %>% group_by(rID) %>% 
+  summarise(times.admission = max(admission_times), times.30.readmit = sum(readmit_30_label)) 
+
+labels.df <- labels.df.full[which(labels.df.full$rID %in% df$patientsid),] %>% select(-rID)
+labels.df.full <- labels.df.full %>% select(-rID)
+```
+
+```{r}
+# update.baseline.df <- cbind(baseline.df, labels.df.full)
+```
+
+
+
+
+# Prepare the attributes dataframe
+```{r}
+base.df <- baseline.df[which(baseline.df$rID %in% df$patientsid),]
+static.df <- static.features[which(static.features$rID %in% df$patientsid),]
+
+
+# select features from "Static Characteristics.xlsx", features has been encoded in one-hot representations
+attris.df.1 <- static.df %>% select("FEMALE", "RACE_White", ends_with("_HST"), starts_with("HX_"), starts_with("CCI_"),
+                 starts_with("TOBACCO_"), starts_with("INSUR_"), ends_with("_CARDIOMYOPATHY"))
+attris.df.1$CCI_TOTAL_SCORE <- NULL   # we don't want the altered CCI_TOTAL_SCORE from static dataframe
+
+
+# select features from original "Filtered Attributes Baseline.xlsx"
+attris.df.2 <- base.df %>% select("rID", "AGE_ADMISSION", "CCI_TOTAL_SCORE", starts_with("BP_"), "PULSE", "BMI", ends_with("_00"), "CTB") 
+
+attris.df <- cbind(attris.df.2, attris.df.1, labels.df)
+
+
+rm(baseline.df, admission.df, static.features, attris.df.1, attris.df.2, labels.df)
+```
+
+
+
+# identify patients in each traj group
+```{r}
+groups <- sort(unique(df$`_traj_Group`))
+pat.membership <- vector(mode="list", length = length(groups))
+for (group in groups){
+  pat.membership[[group]] <- df$patientsid[which(df$`_traj_Group`==group)]
+}
+```
+
+
+
+# demographic features
+AGE_ADMISSION, RACE, GENDER, TOBACCO_STATUS, INSURANCE_PAYER
+```{r}
+# summary(static.features$RACE_White)
+numeric.list <- c("n","%n","AGE_ADMISSION", "std(AGE)",  "CCI_TOTAL_SCORE", "std(CCI_SCORE)", "BP_SYSTOLIC", "std(BP_SYSTOLIC)", "BP_DIASTOLIC", "std(BP_DIASTOLIC)", "PULSE", "std(PULSE)","BMI", "std(BMI)")
+nu.list <- c("AGE_ADMISSION", "CCI_TOTAL_SCORE", "BP_SYSTOLIC", "BP_DIASTOLIC", "PULSE", "BMI")
+binary.list <- colnames(attris.df)[-1]
+binary.list <- binary.list[!binary.list %in% nu.list]
+attributes.list <- c(numeric.list, binary.list)
+
+
+profile.df <- data.frame(row.names = groups)
+
+
+for (group in groups){
+  k <- 1
+  profile.df[group, 1] <- length(pat.membership[[group]])
+  profile.df[group, 2] <- length(pat.membership[[group]])/1468
+  k <- k+2
+  for (val in nu.list){
+    profile.df[group, k] <- mean(attris.df[[val]][which(attris.df$rID %in% pat.membership[[group]])], na.rm = TRUE)
+    profile.df[group, k+1] <- sd(attris.df[[val]][which(attris.df$rID %in% pat.membership[[group]])], na.rm = TRUE)
+    k <- k+2
+  }
+  k <- 15
+  for (attri in binary.list){
+    # print(attri)
+    profile.df[group, k] <- sum(attris.df[[attri]][which(attris.df$rID %in% pat.membership[[group]])], na.rm = TRUE)/length(pat.membership[[group]])
+    k <- k+1
+  }
+}
+
+names(profile.df) <- attributes.list
+profile.df <- cbind(groups, profile.df)
+
+rm(k, val)
+```
+
+
+# save dataset
+```{r}
+write.xlsx(profile.df, '~/Desktop/traj profile.xlsx', col.names = TRUE, row.names = FALSE)
+# write.xlsx(update.baseline.df, '~/Desktop/datasets/processed/Filtered Attributes Baseline.xlsx', col.names = TRUE, row.names = FALSE)
+```
+
+
+```{r}
+col.list <- c(nu.list, binary.list)
+col.list.1 <- col.list[c(24, 61:67)]
+col.list.2 <- col.list[!col.list %in% col.list.1]
+```
+

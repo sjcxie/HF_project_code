@@ -1,0 +1,181 @@
+{smcl}
+{com}{sf}{ul off}{txt}{.-}
+      name:  {res}<unnamed>
+       {txt}log:  {res}/Users/jinchenxie/Documents/GitHub/HF_project_code/GBTM/sample_results/Glucose results.smcl
+  {txt}log type:  {res}smcl
+ {txt}opened on:  {res}15 Jun 2020, 13:34:07
+
+{com}. traj, var(GLUCOSE_*) indep(T_*) model(cnorm) min(1.3) max(2.8) order(0 1 3 2 2 3)
+{txt} 
+==== traj stata plugin ====  Jones BL  Nagin DS,  build: May 12 2020
+ 
+1461 observations read.
+1461 observations used in the trajectory model.
+ 
+			Maximum Likelihood Estimates
+			Model: Censored Normal (cnorm)
+
+			       Standard       T for H0:
+ Group   Parameter        Estimate        Error     Parameter=0   Prob > |T|
+ 
+ 1       Intercept         2.09622      0.01073         195.371       0.0000
+ 
+ 2       Intercept         2.02851      0.00842         241.047       0.0000
+         Linear           -0.00279      0.00126          -2.222       0.0263
+ 
+ 3       Intercept         2.17046      0.05264          41.230       0.0000
+         Linear           -0.03883      0.02795          -1.389       0.1648
+         Quadratic         0.00906      0.00415           2.186       0.0288
+         Cubic            -0.00039      0.00017          -2.271       0.0232
+ 
+ 4       Intercept         2.10759      0.02847          74.025       0.0000
+         Linear            0.07270      0.01019           7.137       0.0000
+         Quadratic        -0.00486      0.00068          -7.135       0.0000
+ 
+ 5       Intercept         2.35940      0.02063         114.394       0.0000
+         Linear           -0.02834      0.00628          -4.515       0.0000
+         Quadratic         0.00110      0.00039           2.801       0.0051
+ 
+ 6       Intercept         2.36123      0.04440          53.181       0.0000
+         Linear            0.04335      0.02459           1.763       0.0779
+         Quadratic        -0.00907      0.00369          -2.458       0.0140
+         Cubic             0.00046      0.00016           2.898       0.0038
+ 
+         Sigma             0.15277      0.00118         129.699       0.0000
+ 
+  Group membership
+ 1       (%)              34.54316      5.40599           6.390       0.0000
+ 2       (%)              26.02879      5.94967           4.375       0.0000
+ 3       (%)              10.00569      2.17906           4.592       0.0000
+ 4       (%)               7.91562      1.65435           4.785       0.0000
+ 5       (%)              16.63336      2.11639           7.859       0.0000
+ 6       (%)               4.87338      0.96580           5.046       0.0000
+ 
+ BIC=  3326.48 (N=9939)  BIC=  3348.53 (N=1461)  AIC=  3409.33  ll=   3432.33
+
+{com}. traj, var(GLUCOSE_*) indep(T_*) model(cnorm) min(1.3) max(2.8) order(1 2 3 2 3)
+{txt} 
+==== traj stata plugin ====  Jones BL  Nagin DS,  build: May 12 2020
+ 
+1461 observations read.
+1461 observations used in the trajectory model.
+ 
+			Maximum Likelihood Estimates
+			Model: Censored Normal (cnorm)
+
+			       Standard       T for H0:
+ Group   Parameter        Estimate        Error     Parameter=0   Prob > |T|
+ 
+ 1       Intercept         2.03998      0.00755         270.307       0.0000
+         Linear           -0.00277      0.00104          -2.668       0.0076
+ 
+ 2       Intercept         2.38318      0.02673          89.173       0.0000
+         Linear           -0.03740      0.00755          -4.954       0.0000
+         Quadratic         0.00163      0.00043           3.752       0.0002
+ 
+ 3       Intercept         2.09509      0.01752         119.611       0.0000
+         Linear           -0.00464      0.00920          -0.504       0.6144
+         Quadratic         0.00260      0.00151           1.723       0.0850
+         Cubic            -0.00016      0.00007          -2.320       0.0204
+ 
+ 4       Intercept         2.14421      0.03078          69.657       0.0000
+         Linear            0.04083      0.01249           3.270       0.0011
+         Quadratic        -0.00244      0.00083          -2.941       0.0033
+ 
+ 5       Intercept         2.30548      0.03820          60.360       0.0000
+         Linear            0.06229      0.02029           3.070       0.0021
+         Quadratic        -0.01066      0.00309          -3.447       0.0006
+         Cubic             0.00049      0.00014           3.642       0.0003
+ 
+         Sigma             0.15382      0.00118         130.663       0.0000
+ 
+  Group membership
+ 1       (%)              33.93254      5.02161           6.757       0.0000
+ 2       (%)              14.02560      2.86603           4.894       0.0000
+ 3       (%)              32.80598      4.54524           7.218       0.0000
+ 4       (%)              12.96353      3.13712           4.132       0.0000
+ 5       (%)               6.27235      1.16285           5.394       0.0000
+ 
+ BIC=  3318.94 (N=9939)  BIC=  3339.08 (N=1461)  AIC=  3394.59  ll=   3415.59
+
+{com}. traj, var(GLUCOSE_*) indep(T_*) model(cnorm) min(1.3) max(2.8) order(1 3 1 3)
+{txt} 
+==== traj stata plugin ====  Jones BL  Nagin DS,  build: May 12 2020
+ 
+1461 observations read.
+1461 observations used in the trajectory model.
+ 
+			Maximum Likelihood Estimates
+			Model: Censored Normal (cnorm)
+
+			       Standard       T for H0:
+ Group   Parameter        Estimate        Error     Parameter=0   Prob > |T|
+ 
+ 1       Intercept         2.04183      0.00765         266.953       0.0000
+         Linear           -0.00286      0.00104          -2.740       0.0061
+ 
+ 2       Intercept         2.08902      0.01733         120.522       0.0000
+         Linear           -0.00099      0.00936          -0.106       0.9157
+         Quadratic         0.00209      0.00154           1.359       0.1742
+         Cubic            -0.00014      0.00007          -2.002       0.0453
+ 
+ 3       Intercept         2.28015      0.00992         229.769       0.0000
+         Linear           -0.00529      0.00127          -4.161       0.0000
+ 
+ 4       Intercept         2.26846      0.03349          67.726       0.0000
+         Linear            0.06486      0.01779           3.647       0.0003
+         Quadratic        -0.00972      0.00270          -3.600       0.0003
+         Cubic             0.00042      0.00012           3.548       0.0004
+ 
+         Sigma             0.15586      0.00118         132.421       0.0000
+ 
+  Group membership
+ 1       (%)              34.52263      5.13486           6.723       0.0000
+ 2       (%)              32.58871      4.81413           6.769       0.0000
+ 3       (%)              24.80981      2.04091          12.156       0.0000
+ 4       (%)               8.07884      1.18259           6.831       0.0000
+ 
+ BIC=  3309.45 (N=9939)  BIC=  3324.79 (N=1461)  AIC=  3367.09  ll=   3383.09
+
+{com}. traj, var(GLUCOSE_*) indep(T_*) model(cnorm) min(1.3) max(2.8) order(2 1 3)
+{txt} 
+==== traj stata plugin ====  Jones BL  Nagin DS,  build: May 12 2020
+ 
+1461 observations read.
+1461 observations used in the trajectory model.
+ 
+			Maximum Likelihood Estimates
+			Model: Censored Normal (cnorm)
+
+			       Standard       T for H0:
+ Group   Parameter        Estimate        Error     Parameter=0   Prob > |T|
+ 
+ 1       Intercept         2.04692      0.00661         309.660       0.0000
+         Linear            0.00411      0.00230           1.784       0.0744
+         Quadratic        -0.00035      0.00016          -2.107       0.0351
+ 
+ 2       Intercept         2.24250      0.00928         241.771       0.0000
+         Linear           -0.00275      0.00099          -2.771       0.0056
+ 
+ 3       Intercept         2.28206      0.02935          77.756       0.0000
+         Linear            0.05570      0.01650           3.376       0.0007
+         Quadratic        -0.00865      0.00254          -3.410       0.0007
+         Cubic             0.00038      0.00011           3.378       0.0007
+ 
+         Sigma             0.15803      0.00117         134.751       0.0000
+ 
+  Group membership
+ 1       (%)              59.27694      1.89541          31.274       0.0000
+ 2       (%)              31.04439      1.83257          16.940       0.0000
+ 3       (%)               9.67867      1.41217           6.854       0.0000
+ 
+ BIC=  3288.33 (N=9939)  BIC=  3299.83 (N=1461)  AIC=  3331.55  ll=   3343.55
+
+{com}. log close
+      {txt}name:  {res}<unnamed>
+       {txt}log:  {res}/Users/jinchenxie/Documents/GitHub/HF_project_code/GBTM/sample_results/Glucose results.smcl
+  {txt}log type:  {res}smcl
+ {txt}closed on:  {res}15 Jun 2020, 13:36:43
+{txt}{.-}
+{smcl}
+{txt}{sf}{ul off}

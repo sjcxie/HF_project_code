@@ -1,0 +1,196 @@
+{smcl}
+{com}{sf}{ul off}{txt}{.-}
+      name:  {res}<unnamed>
+       {txt}log:  {res}/Users/jinchenxie/Documents/GitHub/HF_project_code/GBTM/sample_results/eGFR results.smcl
+  {txt}log type:  {res}smcl
+ {txt}opened on:  {res}15 Jun 2020, 11:51:39
+
+{com}. traj, var(EGFR_*) indep(T_*) model(cnorm) min(1.3) max(12.3) order(3 3 3 2 2 1)
+{txt} 
+==== traj stata plugin ====  Jones BL  Nagin DS,  build: May 12 2020
+ 
+1461 observations read.
+1461 observations used in the trajectory model.
+ 
+			Maximum Likelihood Estimates
+			Model: Censored Normal (cnorm)
+
+			       Standard       T for H0:
+ Group   Parameter        Estimate        Error     Parameter=0   Prob > |T|
+ 
+ 1       Intercept         3.82824      0.14775          25.910       0.0000
+         Linear           -0.32663      0.08270          -3.950       0.0001
+         Quadratic         0.03769      0.01295           2.910       0.0036
+         Cubic            -0.00137      0.00058          -2.377       0.0175
+ 
+ 2       Intercept         6.06694      0.16785          36.145       0.0000
+         Linear           -0.50443      0.08996          -5.607       0.0000
+         Quadratic         0.04118      0.01401           2.940       0.0033
+         Cubic            -0.00125      0.00063          -1.995       0.0461
+ 
+ 3       Intercept         7.23855      0.11961          60.516       0.0000
+         Linear           -0.46252      0.06984          -6.622       0.0000
+         Quadratic         0.04339      0.01127           3.851       0.0001
+         Cubic            -0.00164      0.00051          -3.204       0.0014
+ 
+ 4       Intercept         8.06872      0.09335          86.433       0.0000
+         Linear           -0.23290      0.02709          -8.598       0.0000
+         Quadratic         0.00762      0.00193           3.951       0.0001
+ 
+ 5       Intercept         9.07820      0.08490         106.928       0.0000
+         Linear           -0.17382      0.03035          -5.728       0.0000
+         Quadratic         0.00522      0.00210           2.481       0.0131
+ 
+ 6       Intercept         9.88591      0.09627         102.688       0.0000
+         Linear           -0.04074      0.01298          -3.138       0.0017
+ 
+         Sigma             1.04359      0.00782         133.419       0.0000
+ 
+  Group membership
+ 1       (%)              10.41039      0.87798          11.857       0.0000
+ 2       (%)              11.81779      1.07906          10.952       0.0000
+ 3       (%)              21.83553      1.47695          14.784       0.0000
+ 4       (%)              26.59578      1.59494          16.675       0.0000
+ 5       (%)              20.40499      1.48518          13.739       0.0000
+ 6       (%)               8.93552      1.03322           8.648       0.0000
+ 
+ BIC=-16518.24 (N=9862)  BIC=-16493.41 (N=1461)  AIC=-16424.68  ll= -16398.68
+
+{com}. trajplot, xtitle(Time) ytitle(sqrt(eGFR)) xlabel(0(1)15) ylabel(2(1)11) ci
+{res}
+{com}. traj, var(EGFR_*) indep(T_*) model(cnorm) min(1.3) max(12.3) order(3 3 3 2 1)
+{txt} 
+==== traj stata plugin ====  Jones BL  Nagin DS,  build: May 12 2020
+ 
+1461 observations read.
+1461 observations used in the trajectory model.
+ 
+			Maximum Likelihood Estimates
+			Model: Censored Normal (cnorm)
+
+			       Standard       T for H0:
+ Group   Parameter        Estimate        Error     Parameter=0   Prob > |T|
+ 
+ 1       Intercept         3.92130      0.15031          26.088       0.0000
+         Linear           -0.33979      0.08281          -4.103       0.0000
+         Quadratic         0.03856      0.01297           2.972       0.0030
+         Cubic            -0.00139      0.00058          -2.413       0.0158
+ 
+ 2       Intercept         7.38924      0.10797          68.439       0.0000
+         Linear           -0.37309      0.06269          -5.951       0.0000
+         Quadratic         0.03084      0.01005           3.070       0.0021
+         Cubic            -0.00110      0.00045          -2.429       0.0152
+ 
+ 3       Intercept         6.29972      0.15455          40.761       0.0000
+         Linear           -0.51511      0.08003          -6.436       0.0000
+         Quadratic         0.04339      0.01271           3.413       0.0006
+         Cubic            -0.00139      0.00057          -2.421       0.0155
+ 
+ 4       Intercept         8.53170      0.07186         118.723       0.0000
+         Linear           -0.24545      0.02233         -10.991       0.0000
+         Quadratic         0.01015      0.00157           6.448       0.0000
+ 
+ 5       Intercept         9.57560      0.05705         167.840       0.0000
+         Linear           -0.06942      0.00890          -7.801       0.0000
+ 
+         Sigma             1.07224      0.00796         134.684       0.0000
+ 
+  Group membership
+ 1       (%)              11.13420      0.91747          12.136       0.0000
+ 2       (%)              26.54762      1.53517          17.293       0.0000
+ 3       (%)              14.51643      1.26298          11.494       0.0000
+ 4       (%)              30.24074      1.59495          18.960       0.0000
+ 5       (%)              17.56102      1.22124          14.380       0.0000
+ 
+ BIC=-16635.06 (N=9862)  BIC=-16614.06 (N=1461)  AIC=-16555.90  ll= -16533.90
+
+{com}. trajplot, xtitle(Time) ytitle(sqrt(eGFR)) xlabel(0(1)15) ylabel(2(1)10) ci
+{res}
+{com}. traj, var(EGFR_*) indep(T_*) model(cnorm) min(1.3) max(12.3) order(3 3 2 1)
+{txt} 
+==== traj stata plugin ====  Jones BL  Nagin DS,  build: May 12 2020
+ 
+1461 observations read.
+1461 observations used in the trajectory model.
+ 
+			Maximum Likelihood Estimates
+			Model: Censored Normal (cnorm)
+
+			       Standard       T for H0:
+ Group   Parameter        Estimate        Error     Parameter=0   Prob > |T|
+ 
+ 1       Intercept         4.43678      0.12729          34.856       0.0000
+         Linear           -0.41923      0.07263          -5.772       0.0000
+         Quadratic         0.04589      0.01145           4.008       0.0001
+         Cubic            -0.00164      0.00051          -3.197       0.0014
+ 
+ 2       Intercept         6.99380      0.10121          69.103       0.0000
+         Linear           -0.45293      0.05933          -7.634       0.0000
+         Quadratic         0.03917      0.00973           4.025       0.0001
+         Cubic            -0.00141      0.00045          -3.157       0.0016
+ 
+ 3       Intercept         8.23574      0.06839         120.420       0.0000
+         Linear           -0.23389      0.02123         -11.018       0.0000
+         Quadratic         0.00822      0.00151           5.428       0.0000
+ 
+ 4       Intercept         9.45227      0.05448         173.499       0.0000
+         Linear           -0.07866      0.00792          -9.936       0.0000
+ 
+         Sigma             1.11316      0.00818         136.016       0.0000
+ 
+  Group membership
+ 1       (%)              15.31684      0.99655          15.370       0.0000
+ 2       (%)              27.87234      1.41484          19.700       0.0000
+ 3       (%)              35.56533      1.51968          23.403       0.0000
+ 4       (%)              21.24549      1.31496          16.157       0.0000
+ 
+ BIC=-16804.36 (N=9862)  BIC=-16788.12 (N=1461)  AIC=-16743.19  ll= -16726.19
+
+{com}. trajplot, xtitle(Time) ytitle(sqrt(eGFR)) xlabel(0(1)15) ylabel(2(1)10) ci
+{res}
+{com}. traj, var(EGFR_*) indep(T_*) model(cnorm) min(1.3) max(12.3) order(3 3 2)
+{txt} 
+==== traj stata plugin ====  Jones BL  Nagin DS,  build: May 12 2020
+ 
+1461 observations read.
+1461 observations used in the trajectory model.
+ 
+			Maximum Likelihood Estimates
+			Model: Censored Normal (cnorm)
+
+			       Standard       T for H0:
+ Group   Parameter        Estimate        Error     Parameter=0   Prob > |T|
+ 
+ 1       Intercept         4.83842      0.12294          39.356       0.0000
+         Linear           -0.41298      0.06981          -5.916       0.0000
+         Quadratic         0.04119      0.01096           3.759       0.0002
+         Cubic            -0.00142      0.00049          -2.911       0.0036
+ 
+ 2       Intercept         7.59257      0.08467          89.675       0.0000
+         Linear           -0.38502      0.04920          -7.826       0.0000
+         Quadratic         0.03271      0.00802           4.080       0.0000
+         Cubic            -0.00113      0.00037          -3.065       0.0022
+ 
+ 3       Intercept         9.19760      0.06554         140.328       0.0000
+         Linear           -0.13800      0.02297          -6.008       0.0000
+         Quadratic         0.00361      0.00163           2.217       0.0267
+ 
+         Sigma             1.21234      0.00881         137.671       0.0000
+ 
+  Group membership
+ 1       (%)              20.17069      1.13093          17.835       0.0000
+ 2       (%)              46.13564      1.47710          31.234       0.0000
+ 3       (%)              33.69367      1.42921          23.575       0.0000
+ 
+ BIC=-17307.84 (N=9862)  BIC=-17294.48 (N=1461)  AIC=-17257.47  ll= -17243.47
+
+{com}. trajplot, xtitle(Time) ytitle(sqrt(eGFR)) xlabel(0(1)15) ylabel(2(1)10) ci
+{res}
+{com}. log close
+      {txt}name:  {res}<unnamed>
+       {txt}log:  {res}/Users/jinchenxie/Documents/GitHub/HF_project_code/GBTM/sample_results/eGFR results.smcl
+  {txt}log type:  {res}smcl
+ {txt}closed on:  {res}15 Jun 2020, 11:54:19
+{txt}{.-}
+{smcl}
+{txt}{sf}{ul off}

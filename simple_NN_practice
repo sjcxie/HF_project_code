@@ -1,0 +1,157 @@
+import pandas as pd
+import numpy as np
+import math
+import matplotlib as mlp
+import sklearn.model_selection as model_selection
+import torch
+from torch.utils.data import Dataset, DataLoader, TensorDataset
+import torch.nn as nn
+import torch.nn.functional as F
+
+
+
+# Import Data
+dt = pd.read_excel('HF-Baseline.xlsx', '00480_Baseline_20200115_NA')
+
+# Data pre-processing
+# drop all the column that have NA
+dt_clean = dt.dropna(axis=1, how='any')
+
+# drop all the column that have type 'object'
+dt_clean_num = dt_clean.drop(list(dt_clean.select_dtypes('object').columns), axis=1)
+
+# normalize columns that have continuous value
+dt_num_nor = dt_clean_num.copy()
+for i in range(dt_num_nor.shape[1]):
+    if (dt_num_nor.iloc[:,i].max()==1):
+        pass
+    else:
+        dt_num_nor.iloc[:, i] = (dt_num_nor.iloc[:, i]-dt_num_nor.iloc[:, i].mean())/dt_num_nor.iloc[:, i].std()
+
+# drop the patient ID feature
+dt_1 = dt_num_nor.drop('rID', 1)
+# Set 'mortality rate' to be the target
+y = dt_1['CTB']
+X = dt_1.drop('CTB', 1)
+
+# Get split train, test data use 'model_selection'
+X_train, X_test, y_train, y_test = model_selection.train_test_split(X, y, train_size=0.80,
+                                                                    test_size=0.20, random_state=101)
+train_x = torch.tensor(X_train.values.astype(np.float32))
+train_y = torch.tensor(y_train.values.astype(np.int_))
+
+test_x = torch.tensor(X_test.values.astype(np.float32))
+test_y = torch.tensor(y_test.values.astype(np.int_))
+
+train_data = TensorDataset(train_x, train_y)
+train_loader = DataLoader(dataset=train_data, batch_size=36, shuffle=True)
+
+validation_data = TensorDataset(test_x, test_y)
+validation_loader = DataLoader(dataset=validation_data, batch_size=15, shuffle=True)
+
+
+class SimpleNN(nn.Module):
+    def __init__(self):
+        super(SimpleNN, self).__init__()
+        # declaring some parameters
+        self.inputSize = 109
+        self.outputSize = 2
+        self.hidden1Size = 500
+        # self.hidden2Size = 200
+        # self.hidden3Size = 20
+
+        # layers of linear transformation
+        self.hidden1 = nn.Linear(self.inputSize, self.hidden1Size)
+        # self.hidden2 = nn.Linear(self.hidden1Size, self.hidden2Size)
+        # self.hidden3 = nn.Linear(self.hidden2Size, self.hidden3Size)
+        self.output = nn.Linear(self.hidden1Size, self.outputSize)
+
+
+        # # sigmoid activation and softmax output
+        # self.sigmoid = nn.Sigmoid()
+        # self.softmax = nn.Softmax(dim=1)
+
+    def forward(self, x):
+
+        x = torch.sigmoid(self.hidden1(x))
+        # x = torch.sigmoid(self.hidden2(x))
+        # x = torch.sigmoid(self.hidden3(x))
+        y = F.softmax(self.output(x), dim=1)
+
+        return y
+
+
+model = SimpleNN()
+optimizer = torch.optim.SGD(model.parameters(), lr=0.01, momentum=0.5)
+criterion = nn.CrossEntropyLoss()
+
+
+def train(epoch, log_interval=20):
+    # set model to training mode
+    model.train()
+
+    # loop over batch from the training set
+    for batch_idx, (data, target) in enumerate(train_loader):
+        # Zero gradient buffers
+        optimizer.zero_grad()
+
+        # pass data through the network
+        output = model(data)
+
+        # calculate loss
+        loss = criterion(output, target)
+
+        # Backpropagate
+        loss.backward()
+
+        # Update Weights
+        optimizer.step()
+
+    print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
+        epoch, batch_idx * len(data), len(train_loader.dataset),
+        100. * batch_idx / len(train_loader), loss.data.item()))
+
+    return
+
+
+def validate(loss_vector, accuracy_vector):
+    model.eval()
+    val_loss, correct = 0, 0
+    for data, target in validation_loader:
+        output = model(data)
+        val_loss += criterion(output, target).data.item()
+        pred = output.data.max(1)[1]
+        correct += pred.eq(target.data).sum()
+
+        val_loss /= len(validation_loader)
+        loss_vector.append(val_loss)
+        accuracy = 100. * correct.to(torch.float32) / len(validation_loader.dataset)
+        accuracy_vector.append(accuracy)
+
+    print('\nValidation set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
+        val_loss, correct, len(validation_loader.dataset), accuracy))
+
+
+num_epochs = 30
+lossv, accv = [], []
+
+for epoch in range(1, num_epochs + 1):
+    train(epoch)
+    validate(lossv, accv)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+model

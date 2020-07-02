@@ -1,0 +1,170 @@
+{smcl}
+{com}{sf}{ul off}{txt}{.-}
+      name:  {res}<unnamed>
+       {txt}log:  {res}/Users/jinchenxie/Documents/GitHub/HF_project_code/GBTM/sample_results/Platelets results.smcl
+  {txt}log type:  {res}smcl
+ {txt}opened on:  {res}15 Jun 2020, 13:40:49
+
+{com}. traj, var(PLATELETS_*) indep(T_*) model(cnorm) min(3.5) max(24.5) order(1 0 1 1 0 0)
+{txt} 
+==== traj stata plugin ====  Jones BL  Nagin DS,  build: May 12 2020
+ 
+1461 observations read.
+1461 observations used in the trajectory model.
+ 
+			Maximum Likelihood Estimates
+			Model: Censored Normal (cnorm)
+
+			       Standard       T for H0:
+ Group   Parameter        Estimate        Error     Parameter=0   Prob > |T|
+ 
+ 1       Intercept         9.49443      0.40399          23.502       0.0000
+         Linear           -0.26390      0.08132          -3.245       0.0012
+ 
+ 2       Intercept        10.97816      0.12535          87.582       0.0000
+ 
+ 3       Intercept        12.80968      0.17326          73.934       0.0000
+         Linear           -0.03731      0.01400          -2.665       0.0077
+ 
+ 4       Intercept        14.43739      0.11975         120.565       0.0000
+         Linear           -0.03886      0.01151          -3.375       0.0007
+ 
+ 5       Intercept        15.94186      0.13532         117.807       0.0000
+ 
+ 6       Intercept        17.88444      0.14570         122.745       0.0000
+ 
+         Sigma             1.77520      0.01368         129.774       0.0000
+ 
+  Group membership
+ 1       (%)               1.48886      0.41354           3.600       0.0003
+ 2       (%)              13.71123      2.09598           6.542       0.0000
+ 3       (%)              25.16173      2.21574          11.356       0.0000
+ 4       (%)              34.91444      2.47721          14.094       0.0000
+ 5       (%)              17.64876      1.69997          10.382       0.0000
+ 6       (%)               7.07498      1.23669           5.721       0.0000
+ 
+ BIC=-20764.03 (N=9633)  BIC=-20749.88 (N=1461)  AIC=-20710.23  ll= -20695.23
+
+{com}. traj, var(PLATELETS_*) indep(T_*) model(cnorm) min(3.5) max(24.5) order(2 1 2 2 0)
+{txt} 
+==== traj stata plugin ====  Jones BL  Nagin DS,  build: May 12 2020
+ 
+1461 observations read.
+1461 observations used in the trajectory model.
+ 
+			Maximum Likelihood Estimates
+			Model: Censored Normal (cnorm)
+
+			       Standard       T for H0:
+ Group   Parameter        Estimate        Error     Parameter=0   Prob > |T|
+ 
+ 1       Intercept        10.81036      0.27878          38.778       0.0000
+         Linear           -0.25631      0.08461          -3.029       0.0025
+         Quadratic         0.01663      0.00654           2.545       0.0110
+ 
+ 2       Intercept        12.31332      0.13436          91.645       0.0000
+         Linear           -0.03872      0.01286          -3.011       0.0026
+ 
+ 3       Intercept        16.09781      0.18799          85.631       0.0000
+         Linear           -0.13547      0.05788          -2.341       0.0193
+         Quadratic         0.01096      0.00413           2.651       0.0080
+ 
+ 4       Intercept        14.00964      0.13763         101.794       0.0000
+         Linear            0.04976      0.03585           1.388       0.1652
+         Quadratic        -0.00591      0.00240          -2.459       0.0139
+ 
+ 5       Intercept        17.81199      0.13199         134.953       0.0000
+ 
+         Sigma             1.79039      0.01372         130.470       0.0000
+ 
+  Group membership
+ 1       (%)               7.83415      1.58603           4.939       0.0000
+ 2       (%)              26.16814      1.81530          14.415       0.0000
+ 3       (%)              19.44733      1.69265          11.489       0.0000
+ 4       (%)              38.85220      2.13274          18.217       0.0000
+ 5       (%)               7.69818      1.20148           6.407       0.0000
+ 
+ BIC=-20805.84 (N=9633)  BIC=-20789.81 (N=1461)  AIC=-20744.87  ll= -20727.87
+
+{com}. trajplot, xtitle(Time) ytitle(sqrt(platelets)) xlabel(0(1)15) ylabel(5(10)20) ci
+{res}
+{com}. trajplot, xtitle(Time) ytitle(sqrt(platelets)) xlabel(0(1)15) ylabel(10(10)20) ci
+{res}
+{com}. traj, var(PLATELETS_*) indep(T_*) model(cnorm) min(3.5) max(24.5) order(2 1 1 0)
+{txt} 
+==== traj stata plugin ====  Jones BL  Nagin DS,  build: May 12 2020
+ 
+1461 observations read.
+1461 observations used in the trajectory model.
+ 
+			Maximum Likelihood Estimates
+			Model: Censored Normal (cnorm)
+
+			       Standard       T for H0:
+ Group   Parameter        Estimate        Error     Parameter=0   Prob > |T|
+ 
+ 1       Intercept        11.31488      0.16153          70.049       0.0000
+         Linear           -0.16470      0.05393          -3.054       0.0023
+         Quadratic         0.00983      0.00394           2.493       0.0127
+ 
+ 2       Intercept        13.24175      0.13231         100.083       0.0000
+         Linear           -0.03633      0.01122          -3.238       0.0012
+ 
+ 3       Intercept        15.09634      0.11919         126.659       0.0000
+         Linear           -0.02493      0.01096          -2.274       0.0230
+ 
+ 4       Intercept        17.38410      0.09877         176.009       0.0000
+ 
+         Sigma             1.82702      0.01387         131.712       0.0000
+ 
+  Group membership
+ 1       (%)              17.02852      1.88746           9.022       0.0000
+ 2       (%)              36.45705      2.18054          16.719       0.0000
+ 3       (%)              34.54365      2.45123          14.092       0.0000
+ 4       (%)              11.97078      1.27615           9.380       0.0000
+ 
+ BIC=-20872.59 (N=9633)  BIC=-20861.27 (N=1461)  AIC=-20829.55  ll= -20817.55
+
+{com}. trajplot, xtitle(Time) ytitle(sqrt(platelets)) xlabel(0(1)15) ylabel(10(10)20) ci
+{res}
+{com}. traj, var(PLATELETS_*) indep(T_*) model(cnorm) min(3.5) max(24.5) order(2 1 0)
+{txt} 
+==== traj stata plugin ====  Jones BL  Nagin DS,  build: May 12 2020
+ 
+1461 observations read.
+1461 observations used in the trajectory model.
+ 
+			Maximum Likelihood Estimates
+			Model: Censored Normal (cnorm)
+
+			       Standard       T for H0:
+ Group   Parameter        Estimate        Error     Parameter=0   Prob > |T|
+ 
+ 1       Intercept        11.75019      0.11951          98.322       0.0000
+         Linear           -0.12868      0.04130          -3.116       0.0018
+         Quadratic         0.00783      0.00297           2.641       0.0083
+ 
+ 2       Intercept        14.20619      0.06877         206.583       0.0000
+         Linear           -0.03408      0.00878          -3.881       0.0001
+ 
+ 3       Intercept        16.74393      0.06037         277.335       0.0000
+ 
+         Sigma             1.88901      0.01413         133.696       0.0000
+ 
+  Group membership
+ 1       (%)              27.66334      1.52387          18.153       0.0000
+ 2       (%)              51.62189      1.65275          31.234       0.0000
+ 3       (%)              20.71477      1.34228          15.433       0.0000
+ 
+ BIC=-21005.84 (N=9633)  BIC=-20997.36 (N=1461)  AIC=-20973.57  ll= -20964.57
+
+{com}. trajplot, xtitle(Time) ytitle(sqrt(platelets)) xlabel(0(1)15) ylabel(10(10)20) ci
+{res}
+{com}. log close
+      {txt}name:  {res}<unnamed>
+       {txt}log:  {res}/Users/jinchenxie/Documents/GitHub/HF_project_code/GBTM/sample_results/Platelets results.smcl
+  {txt}log type:  {res}smcl
+ {txt}closed on:  {res}15 Jun 2020, 13:43:07
+{txt}{.-}
+{smcl}
+{txt}{sf}{ul off}

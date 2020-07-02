@@ -1,0 +1,396 @@
+---
+title: "Missing value Imputation"
+author: Jinchen Xie
+date: 29/Nov/2019
+output: 
+  html_document:
+    theme: paper
+    highlight: tango
+    toc: true
+    toc_depth: 3
+    number_sections: true
+---
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(echo=FALSE, warning=FALSE, message=FALSE)
+library(tidyverse)
+library(knitr)
+library(readxl)
+```
+
+# Import Data
+```{r}
+baseline_30NA <- read_excel("~/Desktop/datasets/processed/Filtered Attributes Baseline.xlsx", sheet = 'updated_folup_NA30_baseline')
+```
+
+```{r}
+admission_30NA <- read_excel("~/Desktop/datasets/processed/Filtered Attributes Admission.xlsx", sheet = 'NA2030_filtered_admission')
+```
+admission_lab: only attributes related to lab measurements
+```{r Create admission_lab dataframe}
+names(admission_30NA)[names(admission_30NA) == "READMISSION_DAYS"] <- "DAYS_READMISSION"
+
+admission_lab <- 
+  select(admission_30NA, -ends_with("_DAYS")) %>% 
+  select(rID, DAYS_READMISSION, WBC:GLUCOSE)
+
+names(admission_lab)[names(admission_lab) == "NA"] <- "N_A"
+
+admission_lab$DAYS_READMISSION[which(is.na(admission_lab$DAYS_READMISSION))] <- 0
+```
+
+```{r}
+summary(admission_lab)
+```
+
+
+# Remove Outliers
+
+```{r Deal with outliers}
+remove_outliers <- function(admission_lab) {
+  for (measure in names(admission_lab)[seq(3,9)]){
+    # eliminate outliers
+    iqr <- IQR(admission_lab[[measure]], na.rm = TRUE)
+    Q <- quantile(admission_lab[[measure]], probs=c(0.25, 0.75), na.rm = TRUE)
+    admission_lab[[measure]][which((admission_lab[[measure]] <  (Q[1] - 1.5*iqr)) | (admission_lab[[measure]] > (Q[2]+1.5*iqr)))] <- NA_real_
+  }
+  return(admission_lab)
+}
+```
+
+```{r}
+admission_lab <- remove_outliers(admission_lab)
+```
+
+```{r}
+summary(admission_lab)
+```
+# Impute Measurements
+
+```{r Mean value imputation}
+imput_wbc <- admission_lab %>% group_by(rID) %>% 
+                summarise(Mean = mean(WBC, na.rm = TRUE))
+
+imput_hgb <- admission_lab %>% group_by(rID) %>% 
+                summarise(Mean = mean(HGB, na.rm = TRUE))
+
+imput_cr <- admission_lab %>% group_by(rID) %>% 
+                summarise(Mean = mean(CR, na.rm = TRUE))
+
+imput_egfr <- admission_lab %>% group_by(rID) %>% 
+                summarise(Mean = mean(EGFR, na.rm = TRUE))
+
+imput_k <- admission_lab %>% group_by(rID) %>% 
+                summarise(Mean = mean(K, na.rm = TRUE))
+imput_na <- admission_lab %>% group_by(rID) %>% 
+                summarise(Mean = mean(N_A, na.rm = TRUE))
+
+imput_glucose <- admission_lab %>% group_by(rID) %>% 
+                summarise(Mean = mean(GLUCOSE, na.rm = TRUE))
+
+
+for (val in seq(1, dim(imput_glucose)[1])) {
+  if(dim(admission_lab[(admission_lab$rID == imput_wbc$rID[val]) & (is.na(admission_lab$WBC)),])[1]!=0){
+    admission_lab$WBC[which((admission_lab$rID == imput_wbc$rID[val]) & (is.na(admission_lab$WBC)))] <- imput_wbc$Mean[val]
+  }else{
+    next
+  }
+}
+for (val in seq(1, dim(imput_glucose)[1])) {  
+  if(dim(admission_lab[(admission_lab$rID == imput_hgb$rID[val]) & (is.na(admission_lab$HGB)),])[1]!=0){
+    admission_lab$HGB[which((admission_lab$rID == imput_hgb$rID[val]) & (is.na(admission_lab$HGB)))] <- imput_hgb$Mean[val]
+  }else{
+    next
+  }
+}
+for (val in seq(1, dim(imput_glucose)[1])) {  
+  if(dim(admission_lab[(admission_lab$rID == imput_cr$rID[val]) & (is.na(admission_lab$CR)),])[1]!=0){
+    admission_lab$CR[which((admission_lab$rID == imput_cr$rID[val]) & (is.na(admission_lab$CR)))] <- imput_cr$Mean[val]
+  }else{
+    next
+  }
+}
+for (val in seq(1, dim(imput_glucose)[1])) { 
+  if(dim(admission_lab[(admission_lab$rID == imput_egfr$rID[val]) & (is.na(admission_lab$EGFR)),])[1]!=0){
+    admission_lab$EGFR[which((admission_lab$rID == imput_egfr$rID[val]) & (is.na(admission_lab$EGFR)))] <- imput_egfr$Mean[val]
+  }else{
+    next
+  }
+}
+for (val in seq(1, dim(imput_glucose)[1])) {  
+  if(dim(admission_lab[(admission_lab$rID == imput_k$rID[val]) & (is.na(admission_lab$K)),])[1]!=0){
+    admission_lab$K[which((admission_lab$rID == imput_k$rID[val]) & (is.na(admission_lab$K)))] <- imput_k$Mean[val]
+  }else{
+    next
+  }
+}
+for (val in seq(1, dim(imput_glucose)[1])) {  
+  if(dim(admission_lab[(admission_lab$rID == imput_na$rID[val]) & (is.na(admission_lab$N_A)),])[1]!=0){
+    admission_lab$N_A[which((admission_lab$rID == imput_na$rID[val]) & (is.na(admission_lab$N_A)))] <- imput_na$Mean[val]
+  }else{
+    next
+  }
+}
+for (val in seq(1, dim(imput_glucose)[1])) {  
+  if(dim(admission_lab[(admission_lab$rID == imput_glucose$rID[val]) & (is.na(admission_lab$GLUCOSE)),])[1]!=0){
+    admission_lab$GLUCOSE[which((admission_lab$rID == imput_glucose$rID[val]) & (is.na(admission_lab$GLUCOSE)))] <- imput_glucose$Mean[val]
+  }else{
+    next
+  }
+}
+```
+
+```{r}
+imputed.labs <- admission_lab
+summary(imputed.labs)
+```
+
+*Generate an original admission_lab*
+```{r}
+admission_lab <- 
+  select(admission_30NA, -ends_with("_DAYS")) %>% 
+  select(rID, DAYS_READMISSION, WBC:GLUCOSE)
+
+names(admission_lab)[names(admission_lab) == "NA"] <- "N_A"
+
+admission_lab$DAYS_READMISSION[which(is.na(admission_lab$DAYS_READMISSION))] <- 0
+
+admission_lab <- remove_outliers(admission_lab)
+```
+
+
+# Remove patients with missing values
+
+Based on the imputed admission labs data:
+```{r}
+na.rid.1 <- dplyr::union(imputed.labs[which(is.na(imputed.labs$WBC)),]$rID, imputed.labs[which(is.na(imputed.labs$HGB)),]$rID) 
+na.rid.2 <- dplyr::union(imputed.labs[which(is.na(imputed.labs$CR)),]$rID, na.rid.1)
+na.rid.3 <- dplyr::union(imputed.labs[which(is.na(imputed.labs$EGFR)),]$rID, imputed.labs[which(is.na(imputed.labs$K)),]$rID)
+na.rid.4 <- dplyr::union(imputed.labs[which(is.na(imputed.labs$N_A)),]$rID, imputed.labs[which(is.na(imputed.labs$GLUCOSE)),]$rID)
+na.rid.1 <- dplyr::union(na.rid.3, na.rid.4)
+na.rid <- dplyr::union(na.rid.1, na.rid.2)
+
+complete.imputed.labs <- imputed.labs[-which(imputed.labs$rID %in% na.rid),]
+```
+
+
+Based on the non-imputed admission labs data:
+```{r}
+na.rid.1 <- dplyr::union(admission_lab[which(is.na(admission_lab$WBC)),]$rID, admission_lab[which(is.na(admission_lab$HGB)),]$rID) 
+na.rid.2 <- dplyr::union(admission_lab[which(is.na(admission_lab$CR)),]$rID, na.rid.1)
+na.rid.3 <- dplyr::union(admission_lab[which(is.na(admission_lab$EGFR)),]$rID, admission_lab[which(is.na(admission_lab$K)),]$rID)
+na.rid.4 <- dplyr::union(admission_lab[which(is.na(admission_lab$N_A)),]$rID, admission_lab[which(is.na(admission_lab$GLUCOSE)),]$rID)
+na.rid.1 <- dplyr::union(na.rid.3, na.rid.4)
+na.rid <- dplyr::union(na.rid.1, na.rid.2)
+
+complete.labs <- admission_lab[-which(admission_lab$rID %in% na.rid),]
+```
+
+`complete.labs` contains `dim(complete.labs)[1]` admission records of `length(unique(complete.labs$rID))` patients.
+`complete.imputed.labs` contains `dim(complete.imputed.labs)[1]` admission records of `length(unique(complete.imputed.labs$rID))` patients.
+
+```{r}
+panel.cor <- function(x, y, digits = 2, prefix = "", cex.cor, ...)
+{
+    usr <- par("usr"); on.exit(par(usr))
+    par(usr = c(0, 1, 0, 1))
+    r <- abs(cor(x, y))
+    txt <- format(c(r, 0.123456789), digits = digits)[1]
+    txt <- paste0(prefix, txt)
+    if(missing(cex.cor)) cex.cor <- 0.8/strwidth(txt)
+    text(0.5, 0.5, txt, cex = cex.cor * r)
+}
+pairs(~WBC + HGB + CR + EGFR + K + N_A + GLUCOSE, data = complete.labs, 
+      lower.panel = panel.cor)
+```
+
+
+
+
+# consider only patients with >=3 readmissions
+```{r}
+readmission_counts <- complete.labs %>% group_by(rID) %>% tally()
+subset_rID <- readmission_counts[which(readmission_counts$n>2),]$rID
+
+complete.labs.3to15 <- complete.labs[which(complete.labs$rID %in% subset_rID),]
+```
+
+
+
+# save two dataset into excel file
+```{r}
+library(openxlsx)
+
+write.xlsx(complete.labs.3to15, '~/Desktop/datasets/processed/admission_labs_3to15.xlsx', sheetName = "No_imputation_3to15",
+  col.names = TRUE, row.names = FALSE)
+write.xlsx(complete.labs, '~/Desktop/datasets/processed/imputed_admission_labs.xlsx', sheetName = "Mean_imputations",
+  col.names = TRUE, row.names = FALSE)
+```
+
+
+# Reshape the dataset for GBTM in STATA
+
+```{r}
+library(data.table)
+```
+
+
+```{r}
+patients_id <- unique(complete.labs.3to15$rID)
+
+generate_col_names <- function(measure_name, patients_id){
+  col_names <- c()
+  for (val in patients_id){
+    col_names <- append(col_names, paste(measure_name, val, sep="_"))
+  }
+ return(col_names) 
+}
+
+measurement_df <- function(orginial_df, new_df, measure_name){
+  col.names <- generate_col_names(measure_name, patients_id)
+  names(new_df) <- col.names
+  
+  for (val in seq(1, length(unique(complete.labs.3to15$rID)))){
+    temp_c <- orginial_df[[measure_name]][which(orginial_df$rID == patients_id[val])]
+    new_df[[col.names[val]]] <- c(temp_c, rep(NA, nrow(new_df)-length(temp_c)))
+  }
+  
+  return(new_df)
+}
+```
+
+*generate column names after transpose*
+```{r}
+change_col_names <- function(measure_name){
+  col_names <- c()
+  for (val in seq(1,15)){
+    col_names <- append(col_names, paste(measure_name, val, sep="_"))
+  }
+  return(col_names)
+}
+
+```
+
+
+## WBC
+
+```{r}
+# wbc_ob <- complete.labs.3to15 %>% select(rID, WBC)
+wbc.df <- data.frame(matrix(ncol = length(unique(complete.labs.3to15$rID)), nrow = 15))
+
+wbc.df <- measurement_df(orginial_df = complete.labs.3to15, new_df = wbc.df, measure_name = 'WBC')
+
+wbc.df.t <- transpose(wbc.df)
+
+names(wbc.df.t) <- change_col_names('WBC')
+```
+
+```{r}
+wbc.df.t.3to8 <- wbc.df.t
+temp_list <- c("WBC_10","WBC_11","WBC_12","WBC_13","WBC_14","WBC_15")
+for (val in temp_list){
+  wbc.df.t.3to8[[val]] <- NULL
+}
+
+```
+
+
+## K
+
+```{r}
+k.df <- data.frame(matrix(ncol = length(unique(complete.labs.3to15$rID)), nrow = 15))
+
+k.df <- measurement_df(orginial_df = complete.labs.3to15, new_df = k.df, measure_name = 'K')
+
+k.df.t <- transpose(k.df)
+
+names(k.df.t) <- change_col_names('K')
+```
+
+
+*DAYS_READMISSION*
+```{r}
+days.df <- data.frame(matrix(ncol = length(unique(complete.labs.3to15$rID)), nrow = 15))
+days.df <- measurement_df(orginial_df = complete.labs.3to15, new_df = days.df, measure_name = 'DAYS_READMISSION')
+
+days.df.t <- transpose(days.df)
+
+names(days.df.t) <- change_col_names('days')
+```
+
+
+*# of times of readmission*
+```{r}
+
+time.df <- data.frame(matrix(ncol = length(unique(complete.labs.3to15$rID)), nrow = 15))
+names(time.df) <- generate_col_names('T', patients_id)
+
+for (val in seq(1, length(unique(complete.labs.3to15$rID)))){
+    time.df[[names(time.df)[val]]] <- seq(1,15)
+}
+
+time.df.t <- transpose(time.df)
+names(time.df.t) <- change_col_names('T')
+
+```
+
+```{r}
+time.df.t.3to8 <- time.df.t
+temp_list <- c("T_10","T_11","T_12","T_13","T_14","T_15")
+for (val in temp_list){
+  time.df.t.3to8[[val]] <- NULL
+}
+```
+
+```{r}
+library(openxlsx)
+```
+
+
+*Combine data to save together as 1 dataframe*
+
+```{r}
+combined.df.1 <- cbind(wbc.df.t, time.df.t)
+write.xlsx(combined.df.1, '~/Desktop/datasets/processed/combined times for gbtm.xlsx', col.names = TRUE, row.names = FALSE)
+```
+
+
+```{r}
+combined.df.2 <- cbind(k.df.t, time.df.t)
+write.xlsx(combined.df.2, '~/Desktop/datasets/processed/combined times for gbtm.xlsx', col.names = TRUE, row.names = FALSE)
+```
+
+
+
+
+```{r}
+write.xlsx(wbc.df, '~/Desktop/datasets/processed/wbc for gbtm.xlsx', col.names = TRUE, row.names = FALSE)
+write.xlsx(days.df, '~/Desktop/datasets/processed/readmission_days for gbtm.xlsx',col.names = TRUE, row.names = FALSE)
+```
+
+
+
+# Transform data to censored normal 
+```{r}
+ggplot(data = complete.labs.3to15, aes(K)) + geom_histogram()
+```
+
+
+```{r}
+summary(complete.labs.3to15$K)
+complete.labs.3to15$K <- log10(complete.labs.3to15$K)
+temp.labs.3to15 <- complete.labs.3to15
+```
+
+```{r}
+complete.labs.3to15$K[which(temp.labs.3to15$K < 0.5)] <- 0
+complete.labs.3to15$K[which(temp.labs.3to15$K >= 0.5 & temp.labs.3to15$K <= 0.55)] <- 1
+complete.labs.3to15$K[which(temp.labs.3to15$K >= 0.55 & temp.labs.3to15$K <= 0.6)] <- 2
+complete.labs.3to15$K[which(temp.labs.3to15$K >= 0.6 & temp.labs.3to15$K <= 0.65)] <- 3
+complete.labs.3to15$K[which(temp.labs.3to15$K >= 0.65 & temp.labs.3to15$K <= 0.7)] <- 4
+complete.labs.3to15$K[which(temp.labs.3to15$K > 0.7)] <- 5
+
+
+```
+
+

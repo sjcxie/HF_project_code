@@ -1,0 +1,187 @@
+{smcl}
+{com}{sf}{ul off}{txt}{.-}
+      name:  {res}<unnamed>
+       {txt}log:  {res}/Users/jinchenxie/Documents/GitHub/HF_project_code/GBTM/sample_results/HCT results.smcl
+  {txt}log type:  {res}smcl
+ {txt}opened on:  {res}15 Jun 2020, 13:51:31
+
+{com}. traj, var(HCT_*) indep(T_*) model(cnorm) min(9.5) max(76.5) order(2 1 3 3 1 1)
+{txt} 
+==== traj stata plugin ====  Jones BL  Nagin DS,  build: May 12 2020
+ 
+1461 observations read.
+1461 observations used in the trajectory model.
+ 
+			Maximum Likelihood Estimates
+			Model: Censored Normal (cnorm)
+
+			       Standard       T for H0:
+ Group   Parameter        Estimate        Error     Parameter=0   Prob > |T|
+ 
+ 1       Intercept        27.89401      0.77584          35.953       0.0000
+         Linear           -0.81485      0.26539          -3.070       0.0021
+         Quadratic         0.04947      0.01731           2.857       0.0043
+ 
+ 2       Intercept        35.55750      0.35521         100.103       0.0000
+         Linear           -0.13258      0.04352          -3.047       0.0023
+ 
+ 3       Intercept        32.75288      0.44465          73.660       0.0000
+         Linear           -1.51041      0.24625          -6.134       0.0000
+         Quadratic         0.20013      0.03937           5.083       0.0000
+         Cubic            -0.00743      0.00179          -4.156       0.0000
+ 
+ 4       Intercept        39.07975      0.81798          47.776       0.0000
+         Linear           -0.34687      0.45243          -0.767       0.4433
+         Quadratic        -0.21086      0.07398          -2.850       0.0044
+         Cubic             0.01275      0.00347           3.681       0.0002
+ 
+ 5       Intercept        41.06005      0.30145         136.210       0.0000
+         Linear           -0.24394      0.03904          -6.249       0.0000
+ 
+ 6       Intercept        46.86748      0.56698          82.662       0.0000
+         Linear           -0.43152      0.07649          -5.641       0.0000
+ 
+         Sigma             4.32940      0.03344         129.464       0.0000
+ 
+  Group membership
+ 1       (%)               4.20420      0.98568           4.265       0.0000
+ 2       (%)              27.16481      2.21647          12.256       0.0000
+ 3       (%)              29.08997      1.77893          16.353       0.0000
+ 4       (%)              13.69537      2.04486           6.697       0.0000
+ 5       (%)              20.78709      1.52456          13.635       0.0000
+ 6       (%)               5.05856      0.91092           5.553       0.0000
+ 
+ BIC=-29595.56 (N=9696)  BIC=-29573.79 (N=1461)  AIC=-29512.99  ll= -29489.99
+
+{com}. trajplot, xtitle(Time) ytitle(HCT) xlabel(0(1)15) ylabel(20(10)50) ci
+{res}
+{com}. traj, var(HCT_*) indep(T_*) model(cnorm) min(9.5) max(76.5) order(3 1 3 2 1)
+{txt} 
+==== traj stata plugin ====  Jones BL  Nagin DS,  build: May 12 2020
+ 
+1461 observations read.
+1461 observations used in the trajectory model.
+ 
+			Maximum Likelihood Estimates
+			Model: Censored Normal (cnorm)
+
+			       Standard       T for H0:
+ Group   Parameter        Estimate        Error     Parameter=0   Prob > |T|
+ 
+ 1       Intercept        31.64196      0.51257          61.732       0.0000
+         Linear           -1.80451      0.28469          -6.339       0.0000
+         Quadratic         0.24283      0.04429           5.483       0.0000
+         Cubic            -0.00930      0.00196          -4.752       0.0000
+ 
+ 2       Intercept        32.35309      0.58417          55.383       0.0000
+         Linear            0.13230      0.06613           2.001       0.0454
+ 
+ 3       Intercept        37.93130      0.66422          57.106       0.0000
+         Linear           -0.46072      0.34591          -1.332       0.1829
+         Quadratic        -0.14353      0.05685          -2.525       0.0116
+         Cubic             0.00944      0.00260           3.625       0.0003
+ 
+ 4       Intercept        39.44071      0.51467          76.633       0.0000
+         Linear           -0.11390      0.12468          -0.913       0.3610
+         Quadratic        -0.01787      0.00875          -2.042       0.0412
+ 
+ 5       Intercept        44.54870      0.53427          83.382       0.0000
+         Linear           -0.30167      0.04955          -6.088       0.0000
+ 
+         Sigma             4.39294      0.03377         130.072       0.0000
+ 
+  Group membership
+ 1       (%)              21.46866      2.15614           9.957       0.0000
+ 2       (%)              21.47877      2.88358           7.449       0.0000
+ 3       (%)              22.44948      2.67365           8.397       0.0000
+ 4       (%)              24.17678      1.94187          12.450       0.0000
+ 5       (%)              10.42631      2.20392           4.731       0.0000
+ 
+ BIC=-29659.08 (N=9696)  BIC=-29640.15 (N=1461)  AIC=-29587.28  ll= -29567.28
+
+{com}. trajplot, xtitle(Time) ytitle(HCT) xlabel(0(1)15) ylabel(20(10)50) ci
+{res}
+{com}. traj, var(HCT_*) indep(T_*) model(cnorm) min(9.5) max(76.5) order(3 2 1 1)
+{txt} 
+==== traj stata plugin ====  Jones BL  Nagin DS,  build: May 12 2020
+ 
+1461 observations read.
+1461 observations used in the trajectory model.
+ 
+			Maximum Likelihood Estimates
+			Model: Censored Normal (cnorm)
+
+			       Standard       T for H0:
+ Group   Parameter        Estimate        Error     Parameter=0   Prob > |T|
+ 
+ 1       Intercept        30.53106      0.58951          51.790       0.0000
+         Linear           -1.51792      0.32126          -4.725       0.0000
+         Quadratic         0.21500      0.05080           4.232       0.0000
+         Cubic            -0.00852      0.00226          -3.772       0.0002
+ 
+ 2       Intercept        35.34434      0.37940          93.158       0.0000
+         Linear           -0.86270      0.09895          -8.719       0.0000
+         Quadratic         0.03724      0.00703           5.297       0.0000
+ 
+ 3       Intercept        38.64763      0.37483         103.107       0.0000
+         Linear           -0.32062      0.03286          -9.758       0.0000
+ 
+ 4       Intercept        43.79028      0.33828         129.448       0.0000
+         Linear           -0.30770      0.03964          -7.763       0.0000
+ 
+         Sigma             4.49687      0.03417         131.612       0.0000
+ 
+  Group membership
+ 1       (%)              17.62490      2.09581           8.410       0.0000
+ 2       (%)              37.50549      2.23381          16.790       0.0000
+ 3       (%)              30.15239      2.11096          14.284       0.0000
+ 4       (%)              14.71723      1.82577           8.061       0.0000
+ 
+ BIC=-29719.57 (N=9696)  BIC=-29705.38 (N=1461)  AIC=-29665.73  ll= -29650.73
+
+{com}. trajplot, xtitle(Time) ytitle(HCT) xlabel(0(1)15) ylabel(20(10)50) ci
+{res}
+{com}. traj, var(HCT_*) indep(T_*) model(cnorm) min(9.5) max(76.5) order(3 2 1)
+{txt} 
+==== traj stata plugin ====  Jones BL  Nagin DS,  build: May 12 2020
+ 
+1461 observations read.
+1461 observations used in the trajectory model.
+ 
+			Maximum Likelihood Estimates
+			Model: Censored Normal (cnorm)
+
+			       Standard       T for H0:
+ Group   Parameter        Estimate        Error     Parameter=0   Prob > |T|
+ 
+ 1       Intercept        31.92999      0.39945          79.934       0.0000
+         Linear           -1.24835      0.23045          -5.417       0.0000
+         Quadratic         0.13963      0.03675           3.799       0.0001
+         Cubic            -0.00471      0.00165          -2.855       0.0043
+ 
+ 2       Intercept        37.15744      0.27229         136.465       0.0000
+         Linear           -0.63655      0.08558          -7.438       0.0000
+         Quadratic         0.02131      0.00613           3.478       0.0005
+ 
+ 3       Intercept        42.61675      0.23373         182.330       0.0000
+         Linear           -0.30713      0.03214          -9.557       0.0000
+ 
+         Sigma             4.61362      0.03451         133.683       0.0000
+ 
+  Group membership
+ 1       (%)              31.93222      1.85799          17.186       0.0000
+ 2       (%)              44.71021      1.79956          24.845       0.0000
+ 3       (%)              23.35757      1.46322          15.963       0.0000
+ 
+ BIC=-29808.12 (N=9696)  BIC=-29796.77 (N=1461)  AIC=-29765.04  ll= -29753.04
+
+{com}. trajplot, xtitle(Time) ytitle(HCT) xlabel(0(1)15) ylabel(20(10)50) ci
+{res}
+{com}. log close
+      {txt}name:  {res}<unnamed>
+       {txt}log:  {res}/Users/jinchenxie/Documents/GitHub/HF_project_code/GBTM/sample_results/HCT results.smcl
+  {txt}log type:  {res}smcl
+ {txt}closed on:  {res}15 Jun 2020, 13:53:53
+{txt}{.-}
+{smcl}
+{txt}{sf}{ul off}

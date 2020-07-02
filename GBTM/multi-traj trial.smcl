@@ -1,0 +1,222 @@
+{smcl}
+{com}{sf}{ul off}{txt}{.-}
+      name:  {res}<unnamed>
+       {txt}log:  {res}/Users/jinchenxie/Documents/GitHub/HF_project_code/GBTM/multi-traj trial.smcl
+  {txt}log type:  {res}smcl
+ {txt}opened on:  {res}11 Jun 2020, 13:45:30
+
+{com}. import excel "/Users/jinchenxie/Desktop/datasets/processed/GBTM_data/combined labs_vs_times.xlsx", sheet("Sheet 1") firstrow clear
+{res}
+{com}. traj, multgroups(7) var1(WBC_*) indep1(T_*) model1(cnorm) max1(9) order1(3 1) var2(HGB_*) indep2(T_*) model2(cnorm) max2(9) order2(1 3)
+{err}The number of multgroups and orders for all models need to agree.
+{txt}{search r(198), local:r(198);}
+
+{com}. traj, multgroups(2) var1(WBC_*) indep1(T_*) model1(cnorm) max1(9) order1(3 1) var2(HGB_*) indep2(T_*) model2(cnorm) max2(9) order2(1 3)
+{txt} 
+==== traj stata plugin ====  Jones BL  Nagin DS,  build: May 12 2020
+ 
+1421 observations read.
+1421 observations used in the trajectory model.
+ 
+ 
+			Maximum Likelihood Estimates
+			Model: Censored Normal (cnorm)
+
+			       Standard       T for H0:
+ Group   Parameter        Estimate        Error     Parameter=0   Prob > |T|
+ 
+ 1       Intercept         3.14209      0.13223          23.763       0.0000
+         Linear            0.18792      0.07874           2.386       0.0170
+         Quadratic        -0.02317      0.01268          -1.827       0.0677
+         Cubic             0.00081      0.00058           1.411       0.1583
+ 
+ 2       Intercept         4.05560      0.07338          55.272       0.0000
+         Linear           -0.02813      0.01137          -2.474       0.0134
+ 
+         Sigma             2.23325      0.01741         128.254       0.0000
+ 
+			Maximum Likelihood Estimates
+			Model: Censored Normal (cnorm)
+
+			       Standard       T for H0:
+ Group   Parameter        Estimate        Error     Parameter=0   Prob > |T|
+ 
+ 1       Intercept         3.73599      0.04501          82.995       0.0000
+         Linear           -0.08225      0.00618         -13.301       0.0000
+ 
+ 2       Intercept         6.43024      0.11498          55.923       0.0000
+         Linear           -0.17931      0.06830          -2.625       0.0087
+         Quadratic         0.01023      0.01105           0.926       0.3547
+         Cubic            -0.00043      0.00050          -0.856       0.3923
+ 
+         Sigma             1.52647      0.01165         131.004       0.0000
+ 
+  Group membership
+ 
+ 1       (%)              59.24269      1.62252          36.513       0.0000
+ 2       (%)              40.75731      1.62252          25.120       0.0000
+ 
+ 
+ BIC=-38619.71 (N=18951)  BIC=-38600.29 (N=1421)  AIC=-38560.84  ll= -38545.84
+
+{com}. multtrajplot, xtitle(Time) ytitle1(WBC) ytitle2(HGB) ylabel1(0(1)9) ylabel2(0(1)9)
+{res}
+{com}. multtrajplot, xtitle(Time) ytitle1(WBC) ytitle2(HGB) ylabel1(1.5(1)7.5) ylabel2(1.5(1)7.5)
+{res}
+{com}. traj, multgroups(7) var1(WBC_*) indep1(T_*) model1(cnorm) max1(9) order1(3 1) var2(HGB_*) indep2(T_*) model2(cnorm) max2(9) order2(1 3) var3(CR_*) indep3(T_*) model3(cnorm) max3(9) order3(3 1) var4(EGFR_*) indep4(T_*) model4(cnorm) max4(9) order4(1 3) var5(K_*) indep5(T_*) model5(cnorm) max5(9) order5(3 3) var6(N_A_*) indep6(T_*) model6(cnorm) max6(9) order6(1 1) var7(GLUCOSE_*) indep7(T_*) model7(cnorm) max7(9) order7(3 3)
+{err}option {bf:var7()} not allowed
+{txt}{search r(198), local:r(198);}
+
+{com}. traj, multgroups(6) var1(WBC_*) indep1(T_*) model1(cnorm) max1(9) order1(3 1) var2(HGB_*) indep2(T_*) model2(cnorm) max2(9) order2(1 3) var3(GLUCOSE_*) indep3(T_*) model3(cnorm) max3(9) order3(3 3) var4(EGFR_*) indep4(T_*) model4(cnorm) max4(9) order4(1 3) var5(K_*) indep5(T_*) model5(cnorm) max5(9) order5(3 3) var6(N_A_*) indep6(T_*) model6(cnorm) max6(9) order6(1 1)
+{err}The number of multgroups and orders for all models need to agree.
+{txt}{search r(198), local:r(198);}
+
+{com}. traj, multgroups(4) var1(WBC_*) indep1(T_*) model1(cnorm) max1(9) order1(3 1) var2(HGB_*) indep2(T_*) model2(cnorm) max2(9) order2(1 3) var3(GLUCOSE_*) indep3(T_*) model3(cnorm) max3(9) order3(3 3) var4(EGFR_*) indep4(T_*) model4(cnorm) max4(9) order4(1 3) 
+{err}The number of multgroups and orders for all models need to agree.
+{txt}{search r(198), local:r(198);}
+
+{com}. traj, multgroups(2) var1(WBC_*) indep1(T_*) model1(cnorm) max1(9) order1(3 1) var2(HGB_*) indep2(T_*) model2(cnorm) max2(9) order2(1 3) var3(GLUCOSE_*) indep3(T_*) model3(cnorm) max3(9) order3(3 3) var4(EGFR_*) indep4(T_*) model4(cnorm) max4(9) order4(1 3) var5(K_*) indep5(T_*) model5(cnorm) max5(9) order5(3 3) var6(N_A_*) indep6(T_*) model6(cnorm) max6(9) order6(1 1)
+{txt} 
+==== traj stata plugin ====  Jones BL  Nagin DS,  build: May 12 2020
+ 
+1421 observations read.
+1421 observations used in the trajectory model.
+ 
+ 
+			Maximum Likelihood Estimates
+			Model: Censored Normal (cnorm)
+
+			       Standard       T for H0:
+ Group   Parameter        Estimate        Error     Parameter=0   Prob > |T|
+ 
+ 1       Intercept         2.81073      0.18791          14.958       0.0000
+         Linear            0.30809      0.11054           2.787       0.0053
+         Quadratic        -0.04144      0.01761          -2.353       0.0186
+         Cubic             0.00168      0.00079           2.122       0.0338
+ 
+ 2       Intercept         3.87858      0.05076          76.414       0.0000
+         Linear           -0.01901      0.00823          -2.309       0.0209
+ 
+         Sigma             2.23518      0.01738         128.604       0.0000
+ 
+			Maximum Likelihood Estimates
+			Model: Censored Normal (cnorm)
+
+			       Standard       T for H0:
+ Group   Parameter        Estimate        Error     Parameter=0   Prob > |T|
+ 
+ 1       Intercept         3.32663      0.06449          51.581       0.0000
+         Linear           -0.02978      0.00942          -3.160       0.0016
+ 
+ 2       Intercept         5.58519      0.09695          57.608       0.0000
+         Linear           -0.21334      0.05831          -3.659       0.0003
+         Quadratic         0.00607      0.00950           0.639       0.5228
+         Cubic             0.00003      0.00043           0.079       0.9367
+ 
+         Sigma             1.79613      0.01369         131.194       0.0000
+ 
+			Maximum Likelihood Estimates
+			Model: Censored Normal (cnorm)
+
+			       Standard       T for H0:
+ Group   Parameter        Estimate        Error     Parameter=0   Prob > |T|
+ 
+ 1       Intercept         5.00223      0.14642          34.164       0.0000
+         Linear           -0.14136      0.08673          -1.630       0.1031
+         Quadratic         0.02802      0.01389           2.017       0.0437
+         Cubic            -0.00147      0.00063          -2.336       0.0195
+ 
+ 2       Intercept         4.60594      0.09548          48.242       0.0000
+         Linear            0.04690      0.05799           0.809       0.4187
+         Quadratic        -0.00067      0.00949          -0.070       0.9440
+         Cubic            -0.00013      0.00044          -0.291       0.7708
+ 
+         Sigma             1.78613      0.01325         134.777       0.0000
+ 
+			Maximum Likelihood Estimates
+			Model: Censored Normal (cnorm)
+
+			       Standard       T for H0:
+ Group   Parameter        Estimate        Error     Parameter=0   Prob > |T|
+ 
+ 1       Intercept         3.23231      0.05655          57.161       0.0000
+         Linear           -0.13071      0.00772         -16.925       0.0000
+ 
+ 2       Intercept         6.27139      0.07500          83.624       0.0000
+         Linear           -0.16481      0.04538          -3.632       0.0003
+         Quadratic         0.00676      0.00742           0.912       0.3620
+         Cubic            -0.00010      0.00034          -0.306       0.7593
+ 
+         Sigma             1.41344      0.01076         131.315       0.0000
+ 
+			Maximum Likelihood Estimates
+			Model: Censored Normal (cnorm)
+
+			       Standard       T for H0:
+ Group   Parameter        Estimate        Error     Parameter=0   Prob > |T|
+ 
+ 1       Intercept         4.62976      0.13745          33.683       0.0000
+         Linear            0.14051      0.08119           1.731       0.0835
+         Quadratic        -0.01733      0.01295          -1.339       0.1807
+         Cubic             0.00080      0.00058           1.372       0.1700
+ 
+ 2       Intercept         3.89162      0.08926          43.599       0.0000
+         Linear            0.05537      0.05415           1.023       0.3065
+         Quadratic        -0.00693      0.00884          -0.784       0.4332
+         Cubic             0.00034      0.00041           0.828       0.4078
+ 
+         Sigma             1.69584      0.01249         135.739       0.0000
+ 
+			Maximum Likelihood Estimates
+			Model: Censored Normal (cnorm)
+
+			       Standard       T for H0:
+ Group   Parameter        Estimate        Error     Parameter=0   Prob > |T|
+ 
+ 1       Intercept         5.56495      0.06127          90.831       0.0000
+         Linear           -0.07001      0.00906          -7.726       0.0000
+ 
+ 2       Intercept         5.38550      0.03915         137.577       0.0000
+         Linear           -0.03103      0.00632          -4.912       0.0000
+ 
+         Sigma             1.75950      0.01287         136.669       0.0000
+ 
+  Group membership
+ 
+ 1       (%)              29.20296      1.29997          22.464       0.0000
+ 2       (%)              70.79704      1.29997          54.460       0.0000
+ 
+ 
+ BIC=-114475.19 (N=57736)  BIC=-114391.84 (N=1421)  AIC=-114273.51  ll= -114228.51
+
+{com}. multtrajplot, xtitle(Time) ytitle1(WBC) ytitle2(HGB) ytitle3(GLUCOSE) ytitle4(EGFR) ytitle5(K) ytitle6(NA) ylabel1(2(1)6) ylabel2(2(1)7) ylabel3(3(1)7) ylabel4(1(1)7) ylabel5(3(1)7) ylabel6(3(1)7)
+{res}
+{com}. graph save Graph "/Users/jinchenxie/Desktop/Graph.gph"
+{res}{txt}(file /Users/jinchenxie/Desktop/Graph.gph saved)
+{com}graph use "/Users/jinchenxie/Desktop/Graph.gph"
+{res}
+{com}. multtrajplot, xtitle(Time) ytitle1(WBC) ytitle2(HGB) ytitle3(GLUCOSE) ytitle4(EGFR) ytitle5(K) ytitle6(NA) ylabel1(2(1)6) ylabel2(2(1)7) ylabel3(3(1)7) ylabel4(1(1)7) ylabel5(3(1)7) ylabel6(3(1)7)
+{res}
+{com}. graph display, xsize(5)
+{res}
+{com}. graph display, ysize(5)
+{res}
+{com}. graph display, ysize(10)
+{res}
+{com}. graph save Graph "/Users/jinchenxie/Desktop/Weekly Progress/week 6/multi_traj_Graph.gph"
+{res}{txt}(file /Users/jinchenxie/Desktop/Weekly Progress/week 6/multi_traj_Graph.gph saved)
+
+{com}. graph save Graph "/Users/jinchenxie/Desktop/Weekly Progress/week 6/multi_traj_Graph.gph", replace
+{res}{txt}(file /Users/jinchenxie/Desktop/Weekly Progress/week 6/multi_traj_Graph.gph saved)
+
+{com}. graph save Graph "/Users/jinchenxie/Desktop/Weekly Progress/week 6/multi_traj_Graph.gph", replace
+{res}{txt}(file /Users/jinchenxie/Desktop/Weekly Progress/week 6/multi_traj_Graph.gph saved)
+
+{com}. {res}{com}log close
+      {txt}name:  {res}<unnamed>
+       {txt}log:  {res}/Users/jinchenxie/Documents/GitHub/HF_project_code/GBTM/multi-traj trial.smcl
+  {txt}log type:  {res}smcl
+ {txt}closed on:  {res}11 Jun 2020, 14:30:55
+{txt}{.-}
+{smcl}
+{txt}{sf}{ul off}

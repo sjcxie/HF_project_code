@@ -1,0 +1,97 @@
+---
+title: "HMM in R"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+
+
+```{r}
+library("readxl")
+library('dplyr')
+```
+
+
+## Import Datasets
+
+```{r}
+# import admission dataset
+baseline_noNA_attris <- read_excel("~/Desktop/datasets/processed/Data_noNA.xlsx", sheet = 'baseline')
+admission_noNA_attris <- read_excel("~/Desktop/datasets/processed/Data_noNA.xlsx", sheet = 'admission')
+baseline_30NA <- read_excel("~/Desktop/datasets/processed/Filtered Attributes Baseline.xlsx", sheet = 'updated_folup_NA30_baseline')
+admission_30NA <- read_excel("~/Desktop/datasets/processed/Filtered Attributes Admission.xlsx", sheet = 'NA2030_filtered_admission')
+```
+
+
+```{r}
+static <- read_excel("~/Desktop/datasets/processed/Static Characteristics.xlsx")
+static['...1'] <- NULL
+```
+
+
+We want to extract a subset of patients with no missing values as for experimenting with models.
+
+```{r}
+# drop columns ends with _DAYS
+admission_2 <- select(admission_30NA, -ends_with("_DAYS") )
+baseline_2 <- select(baseline_30NA, -ends_with("_DAYS") )
+baseline_complete <- baseline_2[complete.cases(baseline_2), ]
+admission_complete <- admission_2[complete.cases(admission_2), ]
+
+data.frame(table(admission_2$rID))
+data.frame(table(admission_complete$rID))
+```
+
+```{r}
+data.frame(table(admission_complete$rID))
+patients_complete <- intersect(basesline_complete$rID, unique(admission_complete$rID))
+baseline_complete <- baseline_complete %>% filter(rID %in% patients_complete)
+admission_complete <- admission_2 %>% filter(rID %in% patients_complete)
+```
+
+```{r}
+summary(admission_complete)
+data.frame(table(mydf$MONTH.YEAR))
+```
+
+
+
+## depmixS4 toy model
+
+```{r}
+library('depmixS4')
+```
+
+```{r}
+data("speed")
+```
+```{r}
+admission_noNA_attris %>% filter(rID == 16)
+```
+
+```{r}
+set.seed(1)
+temp_df <- admission_30NA %>% filter(rID == 16) %>% select(LOS_DAYS, I_STROKEFLAG, AGE_ADMISSION, CARDIACFLAG, HFFLAG, K, "NA", HCT, readmission_days_btw, AFIBFLAG)
+
+mod1 <- depmix(list(LOS_DAYS ~ 1, K~ 1, CARDIACFLAG ~ 1, HFFLAG ~ 1, AFIBFLAG ~ 1), data = temp_df, nstates = 2, 
+              family = list(gaussian(),  gaussian(), binomial(), binomial(), binomial()), instart = runif(2))
+fm1 <- fit(mod1, verbose = FALSE, emc=em.control(rand=FALSE))
+
+mod2 <- depmix(list(LOS_DAYS ~ 1, K~ 1, CARDIACFLAG ~ 1, HFFLAG ~ 1, AFIBFLAG ~ 1), data = temp_df, nstates = 3, 
+              family = list(gaussian(),  gaussian(), binomial(), binomial(), binomial()), instart = runif())
+fm2 <- fit(mod2, verbose = FALSE, emc=em.control((maxit=1000)))
+
+```
+
+```{r}
+plot(1:2,c(BIC(fm1),BIC(fm2)),ty="b")
+```
+
