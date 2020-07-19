@@ -1,0 +1,290 @@
+---------------------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  /Users/jinchenxie/Documents/GitHub/HF_project_code/GBTM/add predictors/add predictors log.log
+  log type:  text
+ opened on:   2 Jul 2020, 14:46:27
+
+. traj, var(HGB_*) indep(T_*) model(cnorm) min(2) max(25) order(3 3 3 2 1) risk(AGE_ADMISSION FEMALE BP_SYSTOLIC BP_D
+> IASTOLIC  INSUR_Medicare  HTN_HST HYPERLIPIDEMIA_HST DIAB_HST VTVF_HST CKD_HST CCI_RENAL_DISEASE ACE_ARB_00) refgro
+> up(1)
+ 
+==== traj stata plugin ====  Jones BL  Nagin DS,  build: May 12 2020
+ 
+1468 observations read.
+1468 observations used in the trajectory model.
+ 
+                        Maximum Likelihood Estimates
+                        Model: Censored Normal (cnorm)
+
+                                       Standard       T for H0:
+ Group   Parameter        Estimate        Error     Parameter=0   Prob > |T|
+ 
+ 1       Intercept        10.09121      0.17900          56.377       0.0000
+         Linear           -0.49226      0.09981          -4.932       0.0000
+         Quadratic         0.06548      0.01544           4.240       0.0000
+         Cubic            -0.00249      0.00068          -3.647       0.0003
+ 
+ 2       Intercept        10.80837      0.24135          44.783       0.0000
+         Linear           -0.13707      0.13780          -0.995       0.3199
+         Quadratic         0.02265      0.02073           1.093       0.2746
+         Cubic            -0.00087      0.00090          -0.966       0.3342
+ 
+ 3       Intercept        12.81817      0.25298          50.669       0.0000
+         Linear           -0.33785      0.13489          -2.505       0.0123
+         Quadratic        -0.02557      0.02132          -1.199       0.2305
+         Cubic             0.00228      0.00095           2.405       0.0162
+ 
+ 4       Intercept        12.74364      0.15639          81.486       0.0000
+         Linear           -0.01539      0.04357          -0.353       0.7240
+         Quadratic        -0.00879      0.00282          -3.114       0.0019
+ 
+ 5       Intercept        14.53568      0.09675         150.241       0.0000
+         Linear           -0.11042      0.01319          -8.372       0.0000
+ 
+         Sigma             1.44791      0.01116         129.743       0.0000
+ 
+  Group membership
+ 
+ 1       Baseline         (0.00000)           .               .            . 
+ 
+ 2       Constant         -0.95050      1.13710          -0.836       0.4032
+         AGE_ADMISSIO      0.00540      0.01525           0.354       0.7232
+         FEMALE            0.02274      0.23486           0.097       0.9229
+         BP_SYSTOLIC      -0.01496      0.00711          -2.104       0.0354
+         BP_DIASTOLIC      0.03884      0.01273           3.052       0.0023
+         INSUR_Medica      0.22063      0.29776           0.741       0.4587
+         HTN_HST           0.03356      0.28806           0.116       0.9073
+         HYPERLIPIDEM     -0.30338      0.26061          -1.164       0.2444
+         DIAB_HST         -0.34119      0.25748          -1.325       0.1852
+         VTVF_HST         -0.18206      0.49317          -0.369       0.7120
+         CKD_HST          -0.19941      0.37583          -0.531       0.5957
+         CCI_RENAL_DI     -0.24408      0.33080          -0.738       0.4606
+         ACE_ARB_00        0.30955      0.24986           1.239       0.2154
+ 
+ 3       Constant         -3.09479      1.38148          -2.240       0.0251
+         AGE_ADMISSIO      0.04372      0.01782           2.454       0.0142
+         FEMALE           -0.43884      0.24901          -1.762       0.0780
+         BP_SYSTOLIC      -0.01808      0.00742          -2.436       0.0148
+         BP_DIASTOLIC      0.04557      0.01328           3.430       0.0006
+         INSUR_Medica     -0.76052      0.28941          -2.628       0.0086
+         HTN_HST          -0.08856      0.29106          -0.304       0.7609
+         HYPERLIPIDEM      0.10012      0.27638           0.362       0.7172
+         DIAB_HST         -0.51567      0.26068          -1.978       0.0479
+         VTVF_HST          0.65784      0.34593           1.902       0.0572
+         CKD_HST           0.23184      0.41455           0.559       0.5760
+         CCI_RENAL_DI     -1.27358      0.39035          -3.263       0.0011
+         ACE_ARB_00        0.80960      0.24560           3.296       0.0010
+ 
+ 4       Constant          1.46593      1.00440           1.460       0.1445
+         AGE_ADMISSIO     -0.01729      0.01233          -1.403       0.1607
+         FEMALE           -0.80859      0.23356          -3.462       0.0005
+         BP_SYSTOLIC      -0.02827      0.00700          -4.038       0.0001
+         BP_DIASTOLIC      0.05812      0.01200           4.844       0.0000
+         INSUR_Medica     -0.37862      0.25236          -1.500       0.1336
+         HTN_HST          -0.12753      0.26012          -0.490       0.6239
+         HYPERLIPIDEM      0.25133      0.25017           1.005       0.3151
+         DIAB_HST         -1.02491      0.24603          -4.166       0.0000
+         VTVF_HST          0.33076      0.34839           0.949       0.3424
+         CKD_HST          -0.97104      0.57045          -1.702       0.0887
+         CCI_RENAL_DI     -1.61684      0.39741          -4.068       0.0000
+         ACE_ARB_00        0.70772      0.22580           3.134       0.0017
+ 
+ 5       Constant          0.63175      1.09640           0.576       0.5645
+         AGE_ADMISSIO     -0.02182      0.01325          -1.647       0.0996
+         FEMALE           -1.89770      0.29965          -6.333       0.0000
+         BP_SYSTOLIC      -0.03875      0.00798          -4.859       0.0000
+         BP_DIASTOLIC      0.08184      0.01319           6.207       0.0000
+         INSUR_Medica     -0.28870      0.27305          -1.057       0.2904
+         HTN_HST           0.04281      0.28310           0.151       0.8798
+         HYPERLIPIDEM     -0.35223      0.27240          -1.293       0.1960
+         DIAB_HST         -0.65031      0.26249          -2.477       0.0132
+         VTVF_HST          0.84030      0.34838           2.412       0.0159
+         CKD_HST          -0.31368      0.46835          -0.670       0.5030
+         CCI_RENAL_DI     -1.57058      0.40190          -3.908       0.0001
+         ACE_ARB_00        0.95212      0.25173           3.782       0.0002
+ 
+ BIC=-18994.42 (N=9709)  BIC=-18928.30 (N=1468)  AIC=-18743.09  ll= -18673.09
+
+. traj, var(EGFR_*) indep(T_*) model(cnorm) min(1) max(194) order(3 3 2 1 1) risk(AGE_ADMISSION RACE_White BP_SYSTOLI
+> C INSUR_Medicare HTN_HST DIAB_HST CKD_HST CCI_RENAL_DISEASE) refgroup(1)
+ 
+==== traj stata plugin ====  Jones BL  Nagin DS,  build: May 12 2020
+ 
+1468 observations read.
+1468 observations used in the trajectory model.
+ 
+                        Maximum Likelihood Estimates
+                        Model: Censored Normal (cnorm)
+
+                                       Standard       T for H0:
+ Group   Parameter        Estimate        Error     Parameter=0   Prob > |T|
+ 
+ 1       Intercept        23.38933      1.72692          13.544       0.0000
+         Linear           -3.54141      0.97469          -3.633       0.0003
+         Quadratic         0.36949      0.15367           2.404       0.0162
+         Cubic            -0.01294      0.00688          -1.882       0.0598
+ 
+ 2       Intercept        51.64422      1.44785          35.670       0.0000
+         Linear           -5.54378      0.82488          -6.721       0.0000
+         Quadratic         0.53556      0.13425           3.989       0.0001
+         Cubic            -0.01999      0.00613          -3.259       0.0011
+ 
+ 3       Intercept        71.28252      1.21980          58.438       0.0000
+         Linear           -3.99634      0.35677         -11.201       0.0000
+         Quadratic         0.16341      0.02547           6.415       0.0000
+ 
+ 4       Intercept        88.39738      1.06122          83.298       0.0000
+         Linear           -1.74433      0.15347         -11.366       0.0000
+ 
+ 5       Intercept       120.85657      2.09094          57.800       0.0000
+         Linear           -1.79723      0.27241          -6.597       0.0000
+ 
+         Sigma            16.19594      0.12000         134.968       0.0000
+ 
+  Group membership
+ 
+ 1       Baseline         (0.00000)           .               .            . 
+ 
+ 2       Constant          1.08698      0.98300           1.106       0.2688
+         AGE_ADMISSIO      0.05767      0.01346           4.285       0.0000
+         RACE_White        0.17734      0.24087           0.736       0.4616
+         BP_SYSTOLIC      -0.02220      0.00489          -4.542       0.0000
+         INSUR_Medica     -0.78537      0.25460          -3.085       0.0020
+         HTN_HST           0.22193      0.25247           0.879       0.3794
+         DIAB_HST         -0.29474      0.22197          -1.328       0.1843
+         CKD_HST          -0.31286      0.29375          -1.065       0.2869
+         CCI_RENAL_DI     -2.05705      0.27390          -7.510       0.0000
+ 
+ 3       Constant          3.46356      0.93351           3.710       0.0002
+         AGE_ADMISSIO      0.01172      0.01247           0.940       0.3472
+         RACE_White        0.33243      0.24280           1.369       0.1710
+         BP_SYSTOLIC      -0.01698      0.00491          -3.459       0.0005
+         INSUR_Medica     -0.74227      0.25209          -2.944       0.0032
+         HTN_HST           0.40292      0.24821           1.623       0.1046
+         DIAB_HST         -0.76905      0.22537          -3.412       0.0006
+         CKD_HST          -1.21404      0.38171          -3.181       0.0015
+         CCI_RENAL_DI     -2.91557      0.30634          -9.517       0.0000
+ 
+ 4       Constant          5.09812      1.00344           5.081       0.0000
+         AGE_ADMISSIO     -0.01303      0.01312          -0.993       0.3208
+         RACE_White        0.72608      0.27709           2.620       0.0088
+         BP_SYSTOLIC      -0.02459      0.00559          -4.400       0.0000
+         INSUR_Medica     -0.68201      0.27413          -2.488       0.0129
+         HTN_HST           0.32028      0.27185           1.178       0.2388
+         DIAB_HST         -0.75520      0.25297          -2.985       0.0028
+         CKD_HST          -1.48078      0.67043          -2.209       0.0272
+         CCI_RENAL_DI     -4.26710      0.63260          -6.745       0.0000
+ 
+ 5       Constant          3.41384      1.31729           2.592       0.0096
+         AGE_ADMISSIO     -0.01797      0.01707          -1.053       0.2924
+         RACE_White        0.94153      0.40741           2.311       0.0209
+         BP_SYSTOLIC      -0.02440      0.00785          -3.108       0.0019
+         INSUR_Medica     -0.39450      0.37420          -1.054       0.2918
+         HTN_HST           0.88510      0.37102           2.386       0.0171
+         DIAB_HST         -0.97012      0.35756          -2.713       0.0067
+         CKD_HST         -13.71359    439.58641          -0.031       0.9751
+         CCI_RENAL_DI     -4.03841      1.03406          -3.905       0.0001
+ 
+ BIC=-43480.26 (N=9934)  BIC=-43430.55 (N=1468)  AIC=-43292.96  ll= -43240.96
+
+. traj, var(HCT_*) indep(T_*) model(cnorm) min(9.5) max(76.5) order(2 1 3 3 1 1) risk(AGE_ADMISSION RACE_White FEMALE
+>  BP_DIASTOLIC INSUR_Medicare MAJOR_BLEED_HST CKD_HST CCI_RENAL_DISEASE) refgroup(1)
+ 
+==== traj stata plugin ====  Jones BL  Nagin DS,  build: May 12 2020
+ 
+1468 observations read.
+1468 observations used in the trajectory model.
+ 
+                        Maximum Likelihood Estimates
+                        Model: Censored Normal (cnorm)
+
+                                       Standard       T for H0:
+ Group   Parameter        Estimate        Error     Parameter=0   Prob > |T|
+ 
+ 1       Intercept        28.50211      1.03088          27.648       0.0000
+         Linear           -1.40397      0.30869          -4.548       0.0000
+         Quadratic         0.08943      0.02013           4.443       0.0000
+ 
+ 2       Intercept        29.51260      0.27379         107.795       0.0000
+         Linear           -0.03979      0.03481          -1.143       0.2531
+ 
+ 3       Intercept        38.72178      0.70486          54.936       0.0000
+         Linear           -0.71149      0.40121          -1.773       0.0762
+         Quadratic        -0.12157      0.06473          -1.878       0.0604
+         Cubic             0.00890      0.00294           3.029       0.0025
+ 
+ 4       Intercept        34.68301      0.78146          44.382       0.0000
+         Linear           -0.61866      0.37504          -1.650       0.0991
+         Quadratic         0.10123      0.05957           1.699       0.0893
+         Cubic            -0.00428      0.00266          -1.608       0.1078
+ 
+ 5       Intercept        40.52851      0.33834         119.787       0.0000
+         Linear           -0.30815      0.04223          -7.298       0.0000
+ 
+ 6       Intercept        45.74082      0.63726          71.778       0.0000
+         Linear           -0.35004      0.06869          -5.096       0.0000
+ 
+         Sigma             4.35196      0.03356         129.667       0.0000
+ 
+  Group membership
+ 
+ 1       Baseline         (0.00000)           .               .            . 
+ 
+ 2       Constant          3.11980      2.72068           1.147       0.2515
+         AGE_ADMISSIO     -0.00567      0.02979          -0.190       0.8492
+         RACE_White        1.02189      0.51118           1.999       0.0456
+         FEMALE            0.67152      0.52929           1.269       0.2046
+         BP_DIASTOLIC     -0.00822      0.01972          -0.417       0.6770
+         INSUR_Medica      0.19186      0.59750           0.321       0.7481
+         MAJOR_BLEED_     -1.00912      0.56948          -1.772       0.0764
+         CKD_HST          -0.56813      0.62378          -0.911       0.3624
+         CCI_RENAL_DI     -1.03784      0.69035          -1.503       0.1328
+ 
+ 3       Constant          0.32463      2.80824           0.116       0.9080
+         AGE_ADMISSIO      0.02086      0.03219           0.648       0.5170
+         RACE_White        1.14553      0.53742           2.132       0.0331
+         FEMALE            0.17942      0.54176           0.331       0.7405
+         BP_DIASTOLIC      0.01760      0.02000           0.880       0.3788
+         INSUR_Medica     -0.65599      0.59767          -1.098       0.2724
+         MAJOR_BLEED_     -1.27453      0.68087          -1.872       0.0613
+         CKD_HST          -0.53771      0.70688          -0.761       0.4469
+         CCI_RENAL_DI     -2.27624      0.74695          -3.047       0.0023
+ 
+ 4       Constant          1.67343      2.61284           0.640       0.5219
+         AGE_ADMISSIO     -0.00539      0.02992          -0.180       0.8571
+         RACE_White        0.59683      0.50254           1.188       0.2350
+         FEMALE            0.41514      0.53857           0.771       0.4408
+         BP_DIASTOLIC      0.01791      0.01879           0.953       0.3406
+         INSUR_Medica      0.21340      0.58780           0.363       0.7166
+         MAJOR_BLEED_     -0.31380      0.52462          -0.598       0.5498
+         CKD_HST          -0.71944      0.61732          -1.165       0.2439
+         CCI_RENAL_DI     -1.58593      0.68352          -2.320       0.0203
+ 
+ 5       Constant          4.52669      2.63925           1.715       0.0864
+         AGE_ADMISSIO     -0.04176      0.02902          -1.439       0.1502
+         RACE_White        0.97102      0.50821           1.911       0.0561
+         FEMALE           -0.70932      0.53753          -1.320       0.1870
+         BP_DIASTOLIC      0.01821      0.01910           0.953       0.3404
+         INSUR_Medica     -0.15075      0.57857          -0.261       0.7944
+         MAJOR_BLEED_     -0.79390      0.56519          -1.405       0.1602
+         CKD_HST          -2.23928      0.85662          -2.614       0.0090
+         CCI_RENAL_DI     -2.67078      0.71037          -3.760       0.0002
+ 
+ 6       Constant          2.00143      2.74646           0.729       0.4662
+         AGE_ADMISSIO     -0.04275      0.03017          -1.417       0.1566
+         RACE_White        1.02789      0.54741           1.878       0.0604
+         FEMALE           -0.92771      0.58679          -1.581       0.1139
+         BP_DIASTOLIC      0.03428      0.02006           1.709       0.0875
+         INSUR_Medica     -0.17176      0.60654          -0.283       0.7770
+         MAJOR_BLEED_     -0.67913      0.61494          -1.104       0.2695
+         CKD_HST          -0.35934      0.71787          -0.501       0.6167
+         CCI_RENAL_DI     -2.44836      0.76104          -3.217       0.0013
+ 
+ BIC=-29724.26 (N=9719)  BIC=-29664.72 (N=1468)  AIC=-29498.03  ll= -29435.03
+
+. log close
+      name:  <unnamed>
+       log:  /Users/jinchenxie/Documents/GitHub/HF_project_code/GBTM/add predictors/add predictors log.log
+  log type:  text
+ closed on:   2 Jul 2020, 14:51:02
+---------------------------------------------------------------------------------------------------------------------

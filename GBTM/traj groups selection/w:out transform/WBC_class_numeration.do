@@ -1,4 +1,4 @@
-import excel "combined gbtm data v2.xlsx", sheet("Sheet 1") firstrow clear
+import excel "/Users/jinchenxie/Desktop/datasets/processed/GBTM_data/combined gbtm data v2.xlsx", sheet("Sheet 1") firstrow
 
 traj, var(WBC_*) indep(T_*) model(cnorm) min(0) max(40) order(3 3 3 3 3 3)
 traj, var(WBC_*) indep(T_*) model(cnorm) min(0) max(40) order(3 2 3 3 3 3)

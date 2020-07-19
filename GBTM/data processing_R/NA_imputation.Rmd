@@ -1,0 +1,52 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(echo=FALSE, warning=FALSE, message=FALSE)
+library(readxl)
+library(openxlsx)
+library(mice)
+```
+
+
+```{r}
+df <- read_excel('~/Desktop/datasets/processed/Filtered Attributes Baseline.xlsx', sheet="NA30_filtered_baseline")
+```
+
+```{r}
+df.sub <- df %>% select(c("AGE_ADMISSION", "FEMALE","BMI", "PULSE", "BP_DIASTOLIC", "BP_SYSTOLIC"), ends_with("_HST"), starts_with("CCI_"), ends_with("_00"))
+md.pattern(df.sub)
+df.update <- df %>% select(-c("BMI", "PULSE", "BP_DIASTOLIC", "BP_SYSTOLIC"))
+# summary(df.sub)
+```
+
+```{r}
+tempData <- mice(df.sub, m=5, method = "pmm")
+tempData$imp$BMI
+completedData <- complete(tempData, 1)
+
+imp.list <- c("BMI", "PULSE", "BP_DIASTOLIC", "BP_SYSTOLIC")
+
+for (val in imp.list){
+  completedData.sub <- cbind(complete(tempData, 1)[val], complete(tempData, 2)[val],
+                           complete(tempData, 3)[val], complete(tempData, 4)[val],
+                           complete(tempData,5)[val])
+  completedData.sub$mean <- rowMeans(completedData.sub)
+  completedData[val] <- completedData.sub$mean
+}
+
+completedData <- select(completedData, imp.list)
+df.update <- cbind(df.update, completedData)
+```
+
+```{r}
+# xyplot(data=tempData, BMI~PULSE+BP_DIASTOLIC+BP_SYSTOLIC, pch=18, cex=1)
+densityplot(tempData)
+```
+```{r}
+write.xlsx(df.update, '~/Desktop/datasets/processed/GBTM_data/Filtered Baseline imputed.xlsx', col.names = TRUE, row.names = FALSE)
+```
+

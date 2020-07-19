@@ -1,0 +1,193 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(echo=FALSE, warning=FALSE, message=FALSE)
+library(tidyverse)
+library(knitr)
+library(readxl)
+library(openxlsx)
+library(data.table)
+library(Hmisc)
+library(arsenal)
+# library(survival)
+# library(survminer)
+library(writexl)
+```
+
+# Import data
+
+```{r}
+static.features <- read_excel("~/Desktop/datasets/processed/Static Characteristics.xlsx", sheet = 'static')
+baseline.df <- read_excel('~/Desktop/datasets/processed/Filtered Baseline imputed.xlsx', sheet = 'Sheet 1')
+admission.df <- read_excel("/Users/jinchenxie/Desktop/datasets/processed/Filtered Attributes Admission v2.xlsx", sheet = 'NA30_filtered_admission')
+# baseline.raw <- read_excel('/Users/jinchenxie/Desktop/datasets/processed/Filtered Attributes Baseline.xlsx', sheet = 'NA30_filtered_baseline')
+series.df <- read_excel('~/Desktop/datasets/processed/GBTM_data/combined gbtm stata data v2.xlsx', sheet = 'Sheet 1')
+# admission.raw <- read_excel('/Users/jinchenxie/Desktop/datasets/HF-Admissions.xlsx', sheet = '00480_Admissions_20200115_NA')
+```
+
+**patient 9597 has POST_VAD ==1 in baseline. We modified admission to match baseline record.**
+```{r}
+admission.df[which((admission.df$rID == 9597)&(admission.df$last_adm==1)),]$POST_VAD <- 1
+```
+
+
+```{r}
+rid <- series.df$patients_id
+```
+
+**We want to profile these 1468 patients together first.**
+
+# Save the FULL cohort baseline and admission
+
+Full cohort: 1558 patients
+
+```{r}
+baseline.sub <- baseline.df[which(baseline.df$rID %in% rid),]
+static.sub <- static.features[which(static.features$rID %in% rid),]
+static.sub <- static.sub[,-c(1)]
+static.sub <- static.sub %>% select(-FEMALE, -starts_with("HX_"), -ends_with("_HST"), -starts_with("CCI_"), -ends_with("_CARDIOMYOPATHY"))
+names(static.sub)[names(static.sub) == "AGE_ADMISSION"] <- "Normalized_Age"
+full.baseline <- cbind(baseline.sub, static.sub)
+
+admission.sub <- admission.df[which(admission.df$rID %in% rid),]
+```
+
+
+```{r}
+list.df <- list("baseline" = full.baseline, "admission" = admission.sub)
+write.xlsx(list.df, '~/Desktop/datasets/processed/GBTM_data/gbtm Cohort data combined.xlsx', col.names = TRUE, row.names = FALSE)
+```
+
+# Profiling
+
+```{r}
+df <- read_excel("~/Desktop/trial save.xlsx", sheet="Sheet1")
+
+baseline.data <- cbind(full.baseline, admission.relevant, df$`_traj_Group`)
+names(baseline.data)[names(baseline.data) == "df$`_traj_Group`"] <- "Group"
+
+temp <- baseline.data %>% select(Group, list.attris)
+
+table.1 <- tableby(Group ~ ., data = temp)
+summary(table.1)
+temp.tab <- as.data.frame(summary(table.1))
+
+# rename first column
+
+temp.tab <- temp.tab[-which(temp.tab[,1]=="&nbsp;&nbsp;&nbsp;Range"),]
+temp.tab <- temp.tab[-which(temp.tab[,1]=="&nbsp;&nbsp;&nbsp;Mean (SD)"),]
+
+temp.tab.filtered <- temp.tab[which(temp.tab$`p value` <= 0.05),]
+temp.tab.filtered <- temp.tab.filtered[-which(as.character(temp.tab.filtered$`p value`)==" NaN"),]
+
+View(temp.tab.filtered)
+# temp.tab[which(temp.tab[,1]=="&nbsp;&nbsp;&nbsp;Mean (SD)"), 1] <- "Mean (SD)"
+# write_xlsx(temp.tab,"~/Desktop/temp.xlsx")
+```
+
+
+# CTB label
+
+
+```{r}
+temp <- full.baseline %>% select(list.attris[1:96])
+
+table.1 <- tableby(`CTB` ~ ., data = temp)
+summary(table.1)
+temp.tab <- as.data.frame(summary(table.1))
+
+temp.tab <- temp.tab[-which(temp.tab[,1]=="&nbsp;&nbsp;&nbsp;Range"),]
+temp.tab[which(temp.tab[,1]=="&nbsp;&nbsp;&nbsp;Mean (SD)"), 1] <- "Mean (SD)"
+View(temp.tab)
+
+# write_xlsx(temp.tab,"~/Desktop/temp.xlsx")
+
+```
+
+
+
+# 30_day_CTB label
+
+```{r}
+baseline.30ctb.1 <- baseline.sub[which(baseline.sub$`30_day_CTB` ==1),]
+baseline.30ctb.0 <- baseline.sub[which(baseline.sub$`30_day_CTB` ==0),]
+
+dim(baseline.30ctb.1)[1]/dim(baseline.sub)[1]
+
+static.30ctb.1 <- static.features[which(static.features$rID %in% baseline.30ctb.1$rID),]
+static.30ctb.0 <- static.features[which(static.features$rID %in% baseline.30ctb.0$rID),]
+```
+
+```{r}
+summary(baseline.30ctb.0$AGE_ADMISSION)
+summary(baseline.30ctb.1$AGE_ADMISSION)
+
+static.30ctb.0 %>% select(RACE_White, FEMALE, starts_with("TOBACCO_"), starts_with("INSUR_")) %>% summary()
+baseline.30ctb.0 %>% select(POST_CRT, POST_VAD, POST_TRANSPLANT) %>% summary()
+```
+
+
+# POST_VAD, POST_TRANSPLANT label
+
+```{r}
+summary(baseline.sub[which(baseline.sub$POST_TRANSPLANT==1),]$AGE_ADMISSION)
+```
+
+
+
+```{r}
+temp <- baseline.sub %>% select(POST_TRANSPLANT,  ends_with("_HST"), starts_with("HX_"))
+
+table.1 <- tableby(POST_TRANSPLANT ~ ., data = temp)
+summary(table.1)
+```
+
+```{r}
+mean(baseline.raw$BMI, na.rm = TRUE)
+mean(baseline.df$BMI)
+mean(baseline.sub$BMI)
+
+
+mean(baseline.raw$PULSE, na.rm = TRUE)
+mean(baseline.df$PULSE)
+mean(baseline.sub$PULSE)
+```
+
+```{r}
+baseline.sub %>%  select(BP_SYSTOLIC, BP_DIASTOLIC, PULSE) %>% 
+  summary()
+baseline.sub[which(baseline.sub$CTB==1),] %>% select(BP_SYSTOLIC, BP_DIASTOLIC, PULSE) %>% 
+  summary()
+```
+
+# Kaplan Meier Curve
+```{r}
+admission.raw.sub <- admission.raw[which(admission.raw$rID %in% baseline.sub$rID),] %>% select(rID, AGE_ADMISSION)
+kapm.df <- baseline.sub %>% select(rID, Corrected_Followup_Days, CTB, POST_VAD, POST_TRANSPLANT)
+
+surv_object <- Surv(time = kapm.df$Corrected_Followup_Days, event = kapm.df$CTB)
+fit1 <- survfit(surv_object ~ POST_VAD, data = kapm.df)
+fit2 <-  survfit(surv_object ~ POST_TRANSPLANT, data = kapm.df)
+```
+
+```{r}
+survminer::ggsurvplot(fit1, data = kapm.df, pva1 = TRUE, xlab = "Follow up days")
+survminer::ggsurvplot(fit2, data = kapm.df, pva1 = TRUE, xlab = "Follow up days")
+```
+
+```{r}
+dim(admission.df)
+dim(admission.sub)
+
+
+admission.df %>% group_by(admission_count) %>% count()
+temp1 <- admission.sub %>% group_by(admission_count) %>% count()
+
+write_xlsx(temp1,"~/Desktop/temp.xlsx")
+```
+
+
+

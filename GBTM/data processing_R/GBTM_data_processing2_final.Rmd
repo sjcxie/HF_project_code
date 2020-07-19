@@ -1,0 +1,617 @@
+---
+title: "GBTM_data_processing2"
+author: "Jinchen Xie"
+date: "6/12/2020"
+output: html_document
+---
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(echo=FALSE, warning=FALSE, message=FALSE)
+library(tidyverse)
+library(knitr)
+library(readxl)
+library(openxlsx)
+library(data.table)
+library(Hmisc)
+```
+
+# import admission dataset
+
+The dataset used is admission withou 30% NA tolerance. 
+```{r}
+admission_30NA <- read_excel("~/Desktop/datasets/processed/Filtered Attributes Admission v2.xlsx", sheet = 'NA30_filtered_admission')
+baseline.df <- read_excel('~/Desktop/datasets/processed/Filtered Baseline imputed.xlsx', sheet = 'Sheet 1')
+```
+
+
+REMOVE admission that the lab measurements were taken after the VAD procedure was done. -->
+752  9438 10540
+```{r}
+# temp1 <- admission_30NA[which((admission_30NA$POST_VAD == 1) &(admission_30NA$POST_VAD_DAYS <admission_30NA$WBC_DAYS)),]$rID
+# # order.inv.rid <- intersect(patients_id, temp1)
+# order.inv.rid <- c(752, 9438, 10540)
+# 
+# admission_30NA <- admission_30NA[-which((admission_30NA$rID %in% order.inv.rid) & (admission_30NA$POST_VAD == 1)),]
+
+# View(admission_lab[which(admission_lab$rID %in% order.inv.rid.2),])
+# order.inv.rid.2 <- order.inv.rid.2[-4]
+# admission_30NA <- admission_30NA[-which((admission_30NA$rID %in% order.inv.rid.2) & (admission_30NA$POST_TRANSPLANT == 1)),]
+```
+
+
+
+
+We are only interested in the continuous lab measurements here. **New dataset: admission_lab**
+
+
+```{r}
+names(admission_30NA)[names(admission_30NA) == "READMISSION_DAYS"] <- "DAYS_READMISSION"
+
+admission_lab <- 
+  select(admission_30NA, -ends_with("_DAYS")) %>% 
+  select(rID, DAYS_READMISSION, WBC:HCT)
+
+admission_procedure <- admission_30NA %>% 
+  select(rID, admission_count, POST_VAD, POST_TRANSPLANT, CABG, PCI, IABP, ABLATION, PACEMAKER_IMPLANT, ICD_IMPLANT, BIV_ICD_IMPLANT)
+
+names(admission_lab)[names(admission_lab) == "NA"] <- "N_A"
+
+admission_lab$DAYS_READMISSION[which(is.na(admission_lab$DAYS_READMISSION))] <- 0
+```
+
+
+```{r}
+# summary(admission_lab)
+# summary(baseline.df$POST_VAD)
+```
+
+
+
+# Data Transformation
+## WBC 
+
+
+**Normal range of WBC is 4-11. **
+*We remove WBC > 40 as outliers. There are 44 admissions with WBC > 50 that got removed.*
+
+
+```{r}
+measure = "WBC"
+admission.wbc <- admission_lab
+summary(admission_lab[[measure]])
+
+print(dim(admission_lab[which(admission_lab$WBC > 40),]))
+admission.wbc[[measure]][which(admission_lab[[measure]]> 40)]  <- NA_real_
+
+# ggplot(data = admission.wbc, aes(WBC)) + geom_histogram(binwidth = 1)
+```
+
+
+```{r}
+admission_lab <- admission.wbc
+```
+
+
+
+## HGB
+
+```{r}
+measure = "HGB"
+admission.hgb <- admission_lab
+summary(admission_lab[[measure]])
+# ggplot(data = admission.hgb, aes(HGB)) + geom_histogram()
+```
+
+```{r}
+admission_lab <- admission.hgb
+```
+
+
+## EGFR
+```{r}
+measure = "EGFR"
+admission.egfr <- admission_lab
+# summary(admission_lab[[measure]])
+# ggplot(data = admission.egfr, aes(EGFR)) + geom_histogram()
+dim(admission_lab[which(admission_lab$EGFR > 200),])
+admission.egfr[[measure]][which(admission_lab[[measure]]> 200)]  <- NA_real_
+# ggplot(data = admission.egfr, aes(EGFR)) + geom_histogram()
+```
+
+```{r}
+admission_lab <- admission.egfr
+```
+
+
+
+
+
+## K
+```{r}
+measure = "K"
+admission.k <- admission_lab
+# summary(admission_lab[[measure]])
+# ggplot(data = admission.k, aes(K)) + geom_histogram()
+```
+
+```{r}
+admission_lab <- admission.k
+```
+
+
+
+
+## N_A
+```{r}
+measure = "N_A"
+admission.na <- admission_lab
+# summary(admission_lab[[measure]])
+# ggplot(data = admission.na, aes(N_A)) + geom_histogram()
+```
+
+
+```{r}
+admission_lab <- admission.na
+```
+
+
+## GLUCOSE
+```{r}
+measure = "GLUCOSE"
+admission.glucose <- admission_lab
+# summary(admission_lab[[measure]])
+# ggplot(data = admission.glucose, aes(GLUCOSE)) + geom_histogram()
+```
+
+```{r}
+dim(admission_lab[which(admission_lab$GLUCOSE > 750),])
+admission.glucose[[measure]][which(admission_lab[[measure]]> 750)]  <- NA_real_
+```
+
+
+```{r}
+admission.glucose[[measure]] <- log10(admission.glucose[[measure]])
+# 
+# ggplot(data = admission.glucose, aes(GLUCOSE)) + geom_histogram() + xlab("log10(glucose)")
+```
+
+
+```{r}
+# normalize <- function(x) {
+#   return ((x - min(x, na.rm = TRUE)) / (max(x, na.rm = TRUE) - min(x, na.rm = TRUE)))
+# }
+# admission.glucose[[measure]] <- normalize(admission.glucose[[measure]])
+# ggplot(data = admission.glucose, aes(GLUCOSE)) + geom_histogram() 
+```
+
+
+
+
+```{r}
+admission_lab <- admission.glucose
+```
+
+
+## PLATELETS
+
+```{r}
+measure = "PLATELETS"
+admission.platelet <- admission_lab
+# summary(admission_lab[[measure]])
+# ggplot(data = admission.platelet, aes(PLATELETS)) + geom_histogram()
+```
+
+```{r}
+dim(admission_lab[which(admission_lab$PLATELETS > 750),])
+admission.platelet[[measure]][which(admission_lab[[measure]]> 750)]  <- NA_real_
+```
+
+```{r}
+admission_lab <- admission.platelet
+```
+
+
+## HCT
+
+```{r}
+measure = "HCT"
+admission.hct <- admission_lab
+# summary(admission_lab[[measure]])
+# ggplot(data = admission.hct, aes(HCT)) + geom_histogram()
+```
+
+```{r}
+admission_lab <- admission.hct
+```
+
+# -------
+```{r}
+rm(admission.wbc, admission.egfr, admission.hgb, admission.k, admission.na, admission.glucose, admission.platelet, admission.hct)
+rm(measure)
+```
+
+
+
+# only >=3 readmissions
+```{r}
+readmission_counts <- admission_lab %>% group_by(rID) %>% tally()
+
+sub_3to15_rID <- readmission_counts[which((readmission_counts$n>2) & (readmission_counts$n<16)),]$rID
+admission_lab.3to15 <- admission_lab[which(admission_lab$rID %in% sub_3to15_rID),]
+```
+
+
+
+# allow missing at random
+```{r}
+list_remove <- c()
+mea.rm <- vector(mode="list", length=7)
+# for each patient exist in the admission_lab.3to5 subset:
+for (id in sub_3to15_rID){
+  sub.df <- admission_lab.3to15[which(admission_lab.3to15$rID == id),]
+  
+  num_wbc <- dim(sub.df[-which(is.na(sub.df$WBC)),])[1]
+  na_wbc <- dim(sub.df[which(is.na(sub.df$WBC)),])[1]
+  num_hgb <- dim(sub.df[-which(is.na(sub.df$HGB)),])[1]
+  na_hgb <- dim(sub.df[which(is.na(sub.df$HGB)),])[1]
+  num_egfr <- dim(sub.df[-which(is.na(sub.df$EGFR)),])[1]
+  na_egfr <- dim(sub.df[which(is.na(sub.df$EGFR)),])[1]
+  num_k <- dim(sub.df[-which(is.na(sub.df$K)),])[1]
+  na_k <- dim(sub.df[which(is.na(sub.df$K)),])[1]
+  num_na <- dim(sub.df[-which(is.na(sub.df$N_A)),])[1]
+  na_na <- dim(sub.df[which(is.na(sub.df$N_A)),])[1]
+  num_glucose <- dim(sub.df[-which(is.na(sub.df$GLUCOSE)),])[1]
+  na_glucose <- dim(sub.df[which(is.na(sub.df$GLUCOSE)),])[1]
+  num_platelets <- dim(sub.df[-which(is.na(sub.df$PLATELETS)),])[1]
+  na_platelets <- dim(sub.df[which(is.na(sub.df$PLATELETS)),])[1]
+  
+  if ((num_wbc<3) & (na_wbc!=0)){
+    mea.rm[[1]] <- c(mea.rm[[1]], id)
+  }
+  if ((num_hgb<3) & (na_hgb!=0)){
+    mea.rm[[2]] <- c(mea.rm[[2]], id)
+  }
+  if ((num_egfr<3) & (na_egfr!=0)){
+    mea.rm[[3]] <- c(mea.rm[[3]], id)
+  }
+  if ((num_k<3) & (na_k!=0)){
+    mea.rm[[4]] <- c(mea.rm[[4]], id)
+  }
+  if ((num_na<3) & (na_na!=0)){
+    mea.rm[[5]] <- c(mea.rm[[5]], id)
+  }
+  if ((num_glucose<3) & (na_glucose!=0)){
+    mea.rm[[6]] <- c(mea.rm[[6]], id)
+  }
+  if ((num_platelets<3) & (na_platelets!=0)){
+    mea.rm[[7]] <- c(mea.rm[[7]], id)
+  }
+  
+  
+  
+  if (((num_wbc<3) & (na_wbc!=0)) | ((num_hgb<3) & (na_hgb!=0)) | ((num_egfr<3) & (na_egfr!=0)) |  ((num_k<3) & (na_k!=0)) | ((num_na<3) & (na_na!=0)) | ((num_glucose<3) & (na_glucose!=0)) | ((num_platelets<3) & (na_platelets!=0))){
+    list_remove <- append(list_remove, id)
+  }else{
+    next
+  }
+}
+
+inter.id <- c()
+for (i in sub_3to15_rID){
+  if ((i %in% mea.rm[[1]]) & (i %in% mea.rm[[2]]) & (i %in% mea.rm[[3]]) & (i %in% mea.rm[[4]]) & (i %in% mea.rm[[5]]) & (i %in% mea.rm[[6]]) & (i %in% mea.rm[[7]])){
+    inter.id <- c(inter.id, i)
+  }
+}
+
+admission_lab.NArandom <- admission_lab.3to15[-which(admission_lab.3to15$rID %in% list_remove),]
+patients_id <- unique(admission_lab.NArandom$rID)
+```
+
+ | ((num_hct<3) & (na_hct!=0))
+if ((num_hct<3) & (na_hct!=0)){
+    mea.rm[[8]] <- c(mea.rm[[8]], id)
+  }
+
+```{r}
+rm(num_wbc,na_wbc,num_hgb ,na_hgb,num_egfr,na_egfr,num_k,na_k, num_na, na_na, num_glucose, na_glucose, na_platelets, num_platelets)
+rm(id, i, inter.id, sub_3to15_rID, sub.df, readmission_counts, list_remove)
+```
+
+
+**1558 patients left in the cohort.**
+
+# transform procedure attributes
+```{r}
+admission_procedure <- admission_procedure[which(admission_procedure$rID %in% patients_id),]
+admission_procedure.updated <- admission_procedure
+
+for (id in patients_id){
+  
+  temp.df <- admission_procedure[which(admission_procedure$rID == id),]
+  for (val in names(temp.df)[-c(1,2)]){
+    if (max(temp.df[val])==1) {
+      count <- temp.df[which(temp.df[val]==1),]$admission_count
+      if (length(count)>1){
+        count <- count[1]
+      }
+
+      admission_procedure.updated[which(admission_procedure.updated$rID==id & admission_procedure.updated$admission_count>=count), val] <- 1
+    }  
+  }
+}
+```
+
+
+
+# -------
+# Reshape for traj model input
+
+*Functions used to transform the shape of dataset:*
+```{r}
+generate_col_names <- function(measure_name, patients_id){
+  col_names <- c()
+  for (val in patients_id){
+    col_names <- append(col_names, paste(measure_name, val, sep="_"))
+  }
+ return(col_names) 
+}
+
+measurement_df <- function(orginial_df, new_df, measure_name){
+  col.names <- generate_col_names(measure_name, patients_id)
+  names(new_df) <- col.names
+  
+  for (val in seq(1, length(unique(admission_lab.NArandom$rID)))){
+    temp_c <- orginial_df[[measure_name]][which(orginial_df$rID == patients_id[val])]
+    new_df[[col.names[val]]] <- c(temp_c, rep(NA, nrow(new_df)-length(temp_c)))
+  }
+  
+  return(new_df)
+}
+
+change_col_names <- function(measure_name){
+  col_names <- c()
+  for (val in seq(1,15)){
+    col_names <- append(col_names, paste(measure_name, val, sep="_"))
+  }
+  return(col_names)
+}
+```
+
+
+*WBC*
+```{r}
+# wbc_ob <- complete.labs.3to15 %>% select(rID, WBC)
+wbc.df <- data.frame(matrix(ncol = length(unique(admission_lab.NArandom$rID)), nrow = 15))
+
+wbc.df <- measurement_df(orginial_df = admission_lab.NArandom, new_df = wbc.df, measure_name = 'WBC')
+
+wbc.df.t <-data.table::transpose(wbc.df)
+
+names(wbc.df.t) <- change_col_names('WBC')
+```
+
+*HGB*
+```{r}
+# wbc_ob <- complete.labs.3to15 %>% select(rID, WBC)
+hgb.df <- data.frame(matrix(ncol = length(unique(admission_lab.NArandom$rID)), nrow = 15))
+
+hgb.df <- measurement_df(orginial_df = admission_lab.NArandom, new_df = hgb.df, measure_name = 'HGB')
+
+hgb.df.t <-data.table::transpose(hgb.df)
+
+names(hgb.df.t) <- change_col_names('HGB')
+```
+
+*EGFR*
+```{r}
+# wbc_ob <- complete.labs.3to15 %>% select(rID, WBC)
+egfr.df <- data.frame(matrix(ncol = length(unique(admission_lab.NArandom$rID)), nrow = 15))
+
+egfr.df <- measurement_df(orginial_df = admission_lab.NArandom, new_df = egfr.df, measure_name = 'EGFR')
+
+egfr.df.t <-data.table::transpose(egfr.df)
+
+names(egfr.df.t) <- change_col_names('EGFR')
+```
+
+*K*
+```{r}
+# wbc_ob <- complete.labs.3to15 %>% select(rID, WBC)
+k.df <- data.frame(matrix(ncol = length(unique(admission_lab.NArandom$rID)), nrow = 15))
+
+k.df <- measurement_df(orginial_df = admission_lab.NArandom, new_df = k.df, measure_name = 'K')
+
+k.df.t <-data.table::transpose(k.df)
+
+names(k.df.t) <- change_col_names('K')
+```
+
+*N_A*
+```{r}
+# wbc_ob <- complete.labs.3to15 %>% select(rID, WBC)
+n_a.df <- data.frame(matrix(ncol = length(unique(admission_lab.NArandom$rID)), nrow = 15))
+
+n_a.df <- measurement_df(orginial_df = admission_lab.NArandom, new_df = n_a.df, measure_name = 'N_A')
+
+n_a.df.t <-data.table::transpose(n_a.df)
+
+names(n_a.df.t) <- change_col_names('N_A')
+```
+
+*GLUCOSE*
+```{r}
+# wbc_ob <- complete.labs.3to15 %>% select(rID, WBC)
+glucose.df <- data.frame(matrix(ncol = length(unique(admission_lab.NArandom$rID)), nrow = 15))
+
+glucose.df <- measurement_df(orginial_df = admission_lab.NArandom, new_df = glucose.df, measure_name = 'GLUCOSE')
+
+glucose.df.t <-data.table::transpose(glucose.df)
+
+names(glucose.df.t) <- change_col_names('GLUCOSE')
+```
+
+
+
+*PLATELETS*
+```{r}
+# wbc_ob <- complete.labs.3to15 %>% select(rID, WBC)
+platelets.df <- data.frame(matrix(ncol = length(unique(admission_lab.NArandom$rID)), nrow = 15))
+
+platelets.df <- measurement_df(orginial_df = admission_lab.NArandom, new_df = platelets.df, measure_name = 'PLATELETS')
+
+platelets.df.t <- data.table::transpose(platelets.df)
+
+names(platelets.df.t) <- change_col_names('PLATELETS')
+```
+
+
+*HCT*
+```{r}
+# wbc_ob <- complete.labs.3to15 %>% select(rID, WBC)
+# hct.df <- data.frame(matrix(ncol = length(unique(admission_lab.NArandom$rID)), nrow = 15))
+# 
+# hct.df <- measurement_df(orginial_df = admission_lab.NArandom, new_df = hct.df, measure_name = 'HCT')
+# 
+# hct.df.t <- data.table::transpose(hct.df)
+# 
+# names(hct.df.t) <- change_col_names('HCT')
+```
+
+*Procedures*
+```{r}
+procedure.list <- names(admission_procedure.updated)[-c(1,2)]
+
+procedure.df <- data.frame(matrix(ncol = length(unique(admission_procedure.updated$rID)), nrow = 15))
+procedure.df <- measurement_df(orginial_df = admission_procedure.updated, new_df = procedure.df, measure_name = procedure.list[1])
+procedure.df.t <- data.table::transpose(procedure.df)
+names(procedure.df.t) <- change_col_names(procedure.list[1])
+
+for (val in procedure.list[-1]){
+  procedure.df.temp <- data.frame(matrix(ncol = length(unique(admission_procedure.updated$rID)), nrow = 15))
+  procedure.df.temp <- measurement_df(orginial_df = admission_procedure.updated, new_df = procedure.df.temp, measure_name = val)
+  procedure.df.temp.t <- data.table::transpose(procedure.df.temp)
+  names(procedure.df.temp.t) <- change_col_names(val)
+  procedure.df.t <- cbind(procedure.df.t, procedure.df.temp.t)
+}
+
+```
+
+
+## number of readmissions
+```{r}
+time.df <- data.frame(matrix(ncol = length(unique(admission_lab.NArandom$rID)), nrow = 15))
+names(time.df) <- generate_col_names('T', patients_id)
+
+for (val in seq(1, length(unique(admission_lab.NArandom$rID)))){
+    time.df[[names(time.df)[val]]] <- seq(1,15)
+}
+
+time.df.t <- data.table::transpose(time.df)
+names(time.df.t) <- change_col_names('T')
+
+```
+
+
+
+# save dataset
+
+```{r}
+combined.labs.time <- cbind(patients_id, wbc.df.t, hgb.df.t, egfr.df.t, k.df.t, n_a.df.t, glucose.df.t, platelets.df.t, time.df.t, procedure.df.t)
+write.xlsx(combined.labs.time, '~/Desktop/datasets/processed/GBTM_data/combined gbtm stata data v4.xlsx', col.names = TRUE, row.names = FALSE)
+```
+
+```{r}
+rm(egfr.df, wbc.df, hgb.df, k.df, k.df.t, n_a.df, glucose.df.t, glucose.df, platelets.df, time.df, time.df.t)
+rm(val, generate_col_names, measurement_df, change_col_names)
+```
+
+
+# dataset characteristics
+```{r}
+# summary(admission_lab.NArandom$WBC)
+# ggplot(data = admission_lab.NArandom, aes(WBC)) + geom_histogram()
+# 
+# summary(admission_lab.NArandom$HGB)
+# ggplot(data = admission_lab.NArandom, aes(HGB)) + geom_histogram()
+# 
+# summary(admission_lab.NArandom$EGFR)
+# ggplot(data = admission_lab.NArandom, aes(EGFR)) + geom_histogram()
+# 
+# summary(admission_lab.NArandom$K)
+# ggplot(data = admission_lab.NArandom, aes(K)) + geom_histogram()
+# 
+# summary(admission_lab.NArandom$GLUCOSE)
+# ggplot(data = admission_lab.NArandom, aes(GLUCOSE)) + geom_histogram()
+# 
+# summary(admission_lab.NArandom$N_A)
+# ggplot(data = admission_lab.NArandom, aes(N_A)) + geom_histogram()
+# 
+# summary(admission_lab.NArandom$PLATELETS)
+# ggplot(data = admission_lab.NArandom, aes(PLATELETS)) + geom_histogram()
+```
+
+**How many readings available at each readmission times?**
+
+# missing CHECK
+
+
+
+```{r}
+combined.labs.time %>% select(starts_with("N_A_")) %>% 
+  summarise_all(funs(na = sum(is.na(.))/(dim(combined.labs.time)[1]), left = sum(!is.na(.))))
+```
+
+
+```{r}
+df <- read_excel("~/Desktop/trial save.xlsx", sheet="Sheet1")
+```
+
+
+# identify patients in each traj group
+```{r}
+groups <- sort(unique(df$`_traj_Group`))
+pat.membership <- vector(mode="list", length = length(groups))
+for (group in groups){
+  pat.membership[[group]] <- df$patients_id[which(df$`_traj_Group`==group)]
+}
+```
+
+
+### WBC
+```{r}
+wbc.t <- cbind(patients_id, wbc.df.t)
+
+na.percol <- vector(mode="list", length=length(pat.membership))
+
+for (i in 1:length(pat.membership)){
+  wbc.groups <- wbc.t[which(wbc.t$patients_id %in% pat.membership[[i]]),]
+  na.percol[[i]] <- wbc.groups %>% select(starts_with("WBC_")) %>% 
+    summarise_all(funs(sum(is.na(.))/(dim(wbc.groups)[1])))
+}
+
+for (i in 1:length(pat.membership)){
+  sub.percol <- data.frame(t(na.percol[[i]]))
+  names(sub.percol) <- c("num_na")
+  print(ggplot(data = sub.percol, aes(x=1:15, y=num_na)) + geom_line(linetype = "dashed") + geom_point() + xlab("times of admission") + ylab("% NA value")+ scale_y_continuous(breaks = seq(0, 1, 0.1)))
+}
+```
+
+### NA
+```{r}
+n_a.t <- cbind(patients_id, n_a.df.t)
+
+na.percol <- vector(mode="list", length=length(pat.membership))
+
+for (i in 1:length(pat.membership)){
+  n_a.groups <- n_a.t[which(n_a.t$patients_id %in% pat.membership[[i]]),]
+  na.percol[[i]] <- n_a.groups %>% select(starts_with("N_A_")) %>% 
+    summarise_all(funs(sum(is.na(.))/(dim(n_a.groups)[1])))
+}
+
+for (i in 1:length(pat.membership)){
+  sub.percol <- data.frame(data.table::transpose(na.percol[[i]]))
+  names(sub.percol) <- c("num_na")
+  print(ggplot(data = sub.percol, aes(x=1:15, y=num_na)) + geom_line(linetype = "dashed") + geom_point() + xlab("times of admission") + ylab("% NA value")+ scale_y_continuous(breaks = seq(0, 1, 0.1)))
+}
+```
+

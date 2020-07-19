@@ -1478,13 +1478,13 @@ window.initializeCodeFolding = function(show) {
   var currentIndex = 1;
 
   // select all R code blocks
-  var rCodeBlocks = $('pre.r, pre.python, pre.bash, pre.sql, pre.cpp, pre.stan, pre.julia');
+  var rCodeBlocks = $('pre.r, pre.python, pre.bash, pre.sql, pre.cpp, pre.stan, pre.julia, pre.foldable');
   rCodeBlocks.each(function() {
 
     // create a collapsable div to wrap the code in
     var div = $('<div class="collapse r-code-collapse"></div>');
-    if (show || $(this)[0].classList.contains('fold-show'))
-      div.addClass('in');
+    show = (show || $(this).hasClass('fold-show')) && !$(this).hasClass('fold-hide');
+    if (show) div.addClass('in');
     var id = 'rcode-643E0F36' + currentIndex++;
     div.attr('id', id);
     $(this).before(div);
@@ -1752,51 +1752,2123 @@ summary {
 <!-- rnb-text-end -->
 <!-- rnb-text-begin -->
 <div id="import-data" class="section level1">
-<h1>import data</h1>
+<h1>Import data</h1>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-output-begin eyJkYXRhIjoiTmV3IG5hbWVzOlxuKiBgYCAtPiAuLi4xXG4ifQ== -->
-<pre><code>New names:
-* `` -&gt; ...1</code></pre>
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p><strong>patient 9597 has POST_VAD ==1 in baseline. We modified admission to match baseline record.</strong></p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p><strong>We want to profile these 1468 patients together first.</strong></p>
+</div>
+<div id="save-the-full-cohort-baseline-and-admission" class="section level1">
+<h1>Save the FULL cohort baseline and admission</h1>
+<p>Full cohort: 1558 patients</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="profiling" class="section level1">
+<h1>Profiling</h1>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="ctb-label" class="section level1">
+<h1>CTB label</h1>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+
+<!-- rnb-html-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbImtuaXRfYXNpcyJdLCJzaXppbmdQb2xpY3kiOltdfX0= -->
+
+<table>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="center">0 (N=966)</th>
+<th align="center">1 (N=592)</th>
+<th align="center">Total (N=1558)</th>
+<th align="right">p value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><strong>AGE_ADMISSION</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">&lt; 0.001</td>
+</tr>
+<tr class="even">
+<td align="left">   Mean (SD)</td>
+<td align="center">60.352 (10.843)</td>
+<td align="center">62.595 (10.120)</td>
+<td align="center">61.204 (10.627)</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">   Range</td>
+<td align="center">20.000 - 75.000</td>
+<td align="center">21.000 - 75.000</td>
+<td align="center">20.000 - 75.000</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left"><strong>CCI_TOTAL_SCORE</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">&lt; 0.001</td>
+</tr>
+<tr class="odd">
+<td align="left">   Mean (SD)</td>
+<td align="center">2.400 (1.814)</td>
+<td align="center">2.755 (1.912)</td>
+<td align="center">2.535 (1.859)</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">   Range</td>
+<td align="center">0.000 - 10.000</td>
+<td align="center">0.000 - 10.000</td>
+<td align="center">0.000 - 10.000</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>BP_SYSTOLIC</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.358</td>
+</tr>
+<tr class="even">
+<td align="left">   Mean (SD)</td>
+<td align="center">123.715 (20.973)</td>
+<td align="center">122.697 (21.567)</td>
+<td align="center">123.328 (21.200)</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">   Range</td>
+<td align="center">67.000 - 204.000</td>
+<td align="center">65.000 - 202.000</td>
+<td align="center">65.000 - 204.000</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left"><strong>BP_DIASTOLIC</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">&lt; 0.001</td>
+</tr>
+<tr class="odd">
+<td align="left">   Mean (SD)</td>
+<td align="center">74.171 (12.561)</td>
+<td align="center">71.900 (12.340)</td>
+<td align="center">73.308 (12.523)</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">   Range</td>
+<td align="center">36.000 - 123.000</td>
+<td align="center">40.000 - 126.000</td>
+<td align="center">36.000 - 126.000</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>PULSE</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.068</td>
+</tr>
+<tr class="even">
+<td align="left">   Mean (SD)</td>
+<td align="center">80.120 (15.369)</td>
+<td align="center">78.671 (14.944)</td>
+<td align="center">79.569 (15.220)</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">   Range</td>
+<td align="center">40.000 - 195.000</td>
+<td align="center">9.000 - 155.000</td>
+<td align="center">9.000 - 195.000</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left"><strong>BMI</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.277</td>
+</tr>
+<tr class="odd">
+<td align="left">   Mean (SD)</td>
+<td align="center">31.704 (7.909)</td>
+<td align="center">31.262 (7.576)</td>
+<td align="center">31.536 (7.784)</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">   Range</td>
+<td align="center">15.000 - 69.050</td>
+<td align="center">16.300 - 74.610</td>
+<td align="center">15.000 - 74.610</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>total_adms</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.003</td>
+</tr>
+<tr class="even">
+<td align="left">   Mean (SD)</td>
+<td align="center">7.694 (5.431)</td>
+<td align="center">8.552 (5.663)</td>
+<td align="center">8.020 (5.534)</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">   Range</td>
+<td align="center">3.000 - 45.000</td>
+<td align="center">3.000 - 52.000</td>
+<td align="center">3.000 - 52.000</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left"><strong>Corrected_Followup_Days</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">&lt; 0.001</td>
+</tr>
+<tr class="odd">
+<td align="left">   Mean (SD)</td>
+<td align="center">1797.571 (789.145)</td>
+<td align="center">1047.711 (696.003)</td>
+<td align="center">1512.644 (838.093)</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">   Range</td>
+<td align="center">67.000 - 3295.000</td>
+<td align="center">21.000 - 3116.000</td>
+<td align="center">21.000 - 3295.000</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>FEMALE</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.045</td>
+</tr>
+<tr class="even">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.378 (0.485)</td>
+<td align="center">0.328 (0.470)</td>
+<td align="center">0.359 (0.480)</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left"><strong>RACE_White</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.264</td>
+</tr>
+<tr class="odd">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.733 (0.443)</td>
+<td align="center">0.758 (0.428)</td>
+<td align="center">0.743 (0.437)</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>TOBACCO_C/Recent</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.542</td>
+</tr>
+<tr class="even">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.248 (0.432)</td>
+<td align="center">0.235 (0.424)</td>
+<td align="center">0.243 (0.429)</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left"><strong>TOBACCO_Never</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.007</td>
+</tr>
+<tr class="odd">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.297 (0.457)</td>
+<td align="center">0.235 (0.424)</td>
+<td align="center">0.273 (0.446)</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>TOBACCO_Q/Remote</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.001</td>
+</tr>
+<tr class="even">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.407 (0.491)</td>
+<td align="center">0.492 (0.500)</td>
+<td align="center">0.439 (0.496)</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left"><strong>INSUR_Commercial</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">&lt; 0.001</td>
+</tr>
+<tr class="odd">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.252 (0.434)</td>
+<td align="center">0.171 (0.376)</td>
+<td align="center">0.221 (0.415)</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>INSUR_Medicaid</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.351</td>
+</tr>
+<tr class="even">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.159 (0.366)</td>
+<td align="center">0.142 (0.349)</td>
+<td align="center">0.153 (0.360)</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left"><strong>INSUR_Medicare</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">&lt; 0.001</td>
+</tr>
+<tr class="odd">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.561 (0.497)</td>
+<td align="center">0.664 (0.473)</td>
+<td align="center">0.600 (0.490)</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>INSUR_Self Pay/ Ot</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.607</td>
+</tr>
+<tr class="even">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.028 (0.165)</td>
+<td align="center">0.024 (0.152)</td>
+<td align="center">0.026 (0.160)</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left"><strong>HTN_HST</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.032</td>
+</tr>
+<tr class="odd">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.573 (0.495)</td>
+<td align="center">0.628 (0.484)</td>
+<td align="center">0.594 (0.491)</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>HYPERLIPIDEMIA_HST</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.110</td>
+</tr>
+<tr class="even">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.435 (0.496)</td>
+<td align="center">0.476 (0.500)</td>
+<td align="center">0.451 (0.498)</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left"><strong>DIAB_HST</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.126</td>
+</tr>
+<tr class="odd">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.427 (0.495)</td>
+<td align="center">0.466 (0.499)</td>
+<td align="center">0.442 (0.497)</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>COPD_HST</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.003</td>
+</tr>
+<tr class="even">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.178 (0.383)</td>
+<td align="center">0.240 (0.427)</td>
+<td align="center">0.202 (0.401)</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left"><strong>CAD_HST</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">&lt; 0.001</td>
+</tr>
+<tr class="odd">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.459 (0.499)</td>
+<td align="center">0.552 (0.498)</td>
+<td align="center">0.494 (0.500)</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>CHF_HST</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.631</td>
+</tr>
+<tr class="even">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.660 (0.474)</td>
+<td align="center">0.672 (0.470)</td>
+<td align="center">0.665 (0.472)</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left"><strong>AFIB_HST</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.336</td>
+</tr>
+<tr class="odd">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.260 (0.439)</td>
+<td align="center">0.282 (0.450)</td>
+<td align="center">0.268 (0.443)</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>PH_HST</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.687</td>
+</tr>
+<tr class="even">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.027 (0.162)</td>
+<td align="center">0.030 (0.172)</td>
+<td align="center">0.028 (0.166)</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left"><strong>PE_HST</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.303</td>
+</tr>
+<tr class="odd">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.042 (0.202)</td>
+<td align="center">0.032 (0.176)</td>
+<td align="center">0.039 (0.192)</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>CARDIAC_ARREST_HST</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.786</td>
+</tr>
+<tr class="even">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.010 (0.101)</td>
+<td align="center">0.012 (0.108)</td>
+<td align="center">0.011 (0.104)</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left"><strong>VTVF_HST</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.718</td>
+</tr>
+<tr class="odd">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.155 (0.362)</td>
+<td align="center">0.162 (0.369)</td>
+<td align="center">0.158 (0.365)</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>VASCULARDISEASE_HST</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.448</td>
+</tr>
+<tr class="even">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.114 (0.318)</td>
+<td align="center">0.127 (0.333)</td>
+<td align="center">0.119 (0.324)</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left"><strong>DVT_HST</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.792</td>
+</tr>
+<tr class="odd">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.025 (0.156)</td>
+<td align="center">0.027 (0.162)</td>
+<td align="center">0.026 (0.158)</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>STROKE_HST</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.946</td>
+</tr>
+<tr class="even">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.095 (0.294)</td>
+<td align="center">0.096 (0.295)</td>
+<td align="center">0.096 (0.294)</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left"><strong>HEMO_STROKE_HST</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.145</td>
+</tr>
+<tr class="odd">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.005 (0.072)</td>
+<td align="center">0.012 (0.108)</td>
+<td align="center">0.008 (0.087)</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>MAJOR_BLEED_HST</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.008</td>
+</tr>
+<tr class="even">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.081 (0.273)</td>
+<td align="center">0.122 (0.327)</td>
+<td align="center">0.096 (0.295)</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left"><strong>CKD_HST</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.008</td>
+</tr>
+<tr class="odd">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.115 (0.319)</td>
+<td align="center">0.162 (0.369)</td>
+<td align="center">0.133 (0.340)</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>ESRD_HST</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.034</td>
+</tr>
+<tr class="even">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.036 (0.187)</td>
+<td align="center">0.059 (0.236)</td>
+<td align="center">0.045 (0.207)</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left"><strong>CIRRHOSIS_HST</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.158</td>
+</tr>
+<tr class="odd">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.011 (0.106)</td>
+<td align="center">0.020 (0.141)</td>
+<td align="center">0.015 (0.121)</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>HX_SEPTIC_SHOCK</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.202</td>
+</tr>
+<tr class="even">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.000 (0.000)</td>
+<td align="center">0.002 (0.041)</td>
+<td align="center">0.001 (0.025)</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">   Range</td>
+<td align="center">0.000 - 0.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left"><strong>HX_SEPSIS</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.543</td>
+</tr>
+<tr class="odd">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.007 (0.085)</td>
+<td align="center">0.010 (0.100)</td>
+<td align="center">0.008 (0.091)</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>HX_CAROTID_OCCLUSION</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.551</td>
+</tr>
+<tr class="even">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.036 (0.187)</td>
+<td align="center">0.042 (0.201)</td>
+<td align="center">0.039 (0.192)</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left"><strong>PRIOR_STERNOTOMY</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">NaN</td>
+</tr>
+<tr class="odd">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.000 (0.000)</td>
+<td align="center">0.000 (0.000)</td>
+<td align="center">0.000 (0.000)</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">   Range</td>
+<td align="center">0.000 - 0.000</td>
+<td align="center">0.000 - 0.000</td>
+<td align="center">0.000 - 0.000</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>PRIOR_PCI</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.600</td>
+</tr>
+<tr class="even">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.105 (0.306)</td>
+<td align="center">0.096 (0.295)</td>
+<td align="center">0.101 (0.302)</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left"><strong>PRIOR_CABG</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.097</td>
+</tr>
+<tr class="odd">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.052 (0.222)</td>
+<td align="center">0.034 (0.181)</td>
+<td align="center">0.045 (0.207)</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>PRIOR_TAVR</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.237</td>
+</tr>
+<tr class="even">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.006 (0.079)</td>
+<td align="center">0.012 (0.108)</td>
+<td align="center">0.008 (0.091)</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left"><strong>PRIOR_SAVR_MECH</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.682</td>
+</tr>
+<tr class="odd">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.012 (0.111)</td>
+<td align="center">0.010 (0.100)</td>
+<td align="center">0.012 (0.107)</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>PRIOR_SAVR_BIO</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.961</td>
+</tr>
+<tr class="even">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.017 (0.128)</td>
+<td align="center">0.017 (0.129)</td>
+<td align="center">0.017 (0.128)</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left"><strong>PRIOR_SURG_AO_GRFT</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.793</td>
+</tr>
+<tr class="odd">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.007 (0.085)</td>
+<td align="center">0.008 (0.092)</td>
+<td align="center">0.008 (0.087)</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>PRIOR_ENDO_AO_GRFT</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.127</td>
+</tr>
+<tr class="even">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.001 (0.032)</td>
+<td align="center">0.005 (0.071)</td>
+<td align="center">0.003 (0.051)</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left"><strong>PRIOR_AO_VLV_REPAIR</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.268</td>
+</tr>
+<tr class="odd">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.002 (0.045)</td>
+<td align="center">0.000 (0.000)</td>
+<td align="center">0.001 (0.036)</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 0.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>PRIOR_SMVR</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.092</td>
+</tr>
+<tr class="even">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.011 (0.106)</td>
+<td align="center">0.003 (0.058)</td>
+<td align="center">0.008 (0.091)</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left"><strong>PRIOR_SPVR</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.727</td>
+</tr>
+<tr class="odd">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.001 (0.032)</td>
+<td align="center">0.002 (0.041)</td>
+<td align="center">0.001 (0.036)</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>PRIOR_STVR</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.011</td>
+</tr>
+<tr class="even">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.000 (0.000)</td>
+<td align="center">0.007 (0.082)</td>
+<td align="center">0.003 (0.051)</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">   Range</td>
+<td align="center">0.000 - 0.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left"><strong>CCI_MI</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.437</td>
+</tr>
+<tr class="odd">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.091 (0.288)</td>
+<td align="center">0.103 (0.304)</td>
+<td align="center">0.096 (0.294)</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>CCI_CHF</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.168</td>
+</tr>
+<tr class="even">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.651 (0.477)</td>
+<td align="center">0.617 (0.487)</td>
+<td align="center">0.638 (0.481)</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left"><strong>CCI_PERIPHERAL_VASC</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">&lt; 0.001</td>
+</tr>
+<tr class="odd">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.317 (0.465)</td>
+<td align="center">0.405 (0.491)</td>
+<td align="center">0.350 (0.477)</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>CCI_CEREBROVASCULAR</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.745</td>
+</tr>
+<tr class="even">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.113 (0.317)</td>
+<td align="center">0.118 (0.323)</td>
+<td align="center">0.115 (0.319)</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left"><strong>CCI_DEMENTIA</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.791</td>
+</tr>
+<tr class="odd">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.004 (0.064)</td>
+<td align="center">0.005 (0.071)</td>
+<td align="center">0.004 (0.067)</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>CCI_COPD</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.021</td>
+</tr>
+<tr class="even">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.189 (0.392)</td>
+<td align="center">0.238 (0.426)</td>
+<td align="center">0.208 (0.406)</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left"><strong>CCI_RHEUMATIC_DISEASE</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.639</td>
+</tr>
+<tr class="odd">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.028 (0.165)</td>
+<td align="center">0.032 (0.176)</td>
+<td align="center">0.030 (0.169)</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>CCI_PEPTIC_ULCER</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.397</td>
+</tr>
+<tr class="even">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.010 (0.101)</td>
+<td align="center">0.015 (0.122)</td>
+<td align="center">0.012 (0.110)</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left"><strong>CCI_MILD_LIVER_DISEASE</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.029</td>
+</tr>
+<tr class="odd">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.023 (0.149)</td>
+<td align="center">0.042 (0.201)</td>
+<td align="center">0.030 (0.171)</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>CCI_DM_NO_CC</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.219</td>
+</tr>
+<tr class="even">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.282 (0.450)</td>
+<td align="center">0.311 (0.463)</td>
+<td align="center">0.293 (0.455)</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left"><strong>CCI_DM_WITH_CC</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.053</td>
+</tr>
+<tr class="odd">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.153 (0.360)</td>
+<td align="center">0.191 (0.393)</td>
+<td align="center">0.168 (0.374)</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>CCI_HEMIPLEGIA</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.328</td>
+</tr>
+<tr class="even">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.007 (0.085)</td>
+<td align="center">0.003 (0.058)</td>
+<td align="center">0.006 (0.076)</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left"><strong>CCI_RENAL_DISEASE</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.002</td>
+</tr>
+<tr class="odd">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.170 (0.376)</td>
+<td align="center">0.235 (0.424)</td>
+<td align="center">0.194 (0.396)</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>CCI_AIDS_HIV</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.281</td>
+</tr>
+<tr class="even">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.005 (0.072)</td>
+<td align="center">0.002 (0.041)</td>
+<td align="center">0.004 (0.062)</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left"><strong>POST_CRT</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.146</td>
+</tr>
+<tr class="odd">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.020 (0.139)</td>
+<td align="center">0.010 (0.100)</td>
+<td align="center">0.016 (0.126)</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>POST_VAD</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.667</td>
+</tr>
+<tr class="even">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.084 (0.277)</td>
+<td align="center">0.078 (0.268)</td>
+<td align="center">0.082 (0.274)</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left"><strong>POST_TRANSPLANT</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">&lt; 0.001</td>
+</tr>
+<tr class="odd">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.093 (0.291)</td>
+<td align="center">0.025 (0.157)</td>
+<td align="center">0.067 (0.251)</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>RESTRICTIVE_CARDIOMYOPATHY</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.434</td>
+</tr>
+<tr class="even">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.001 (0.032)</td>
+<td align="center">0.000 (0.000)</td>
+<td align="center">0.001 (0.025)</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 0.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left"><strong>HYPERTROPHIC_CARDIOMYOPATHY</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.621</td>
+</tr>
+<tr class="odd">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.002 (0.045)</td>
+<td align="center">0.003 (0.058)</td>
+<td align="center">0.003 (0.051)</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>ISCHEMIC_CARDIOMYOPATHY</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.750</td>
+</tr>
+<tr class="even">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.077 (0.266)</td>
+<td align="center">0.081 (0.273)</td>
+<td align="center">0.078 (0.269)</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left"><strong>PERIPARTUM_CARDIOMYOPATHY</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.592</td>
+</tr>
+<tr class="odd">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.003 (0.056)</td>
+<td align="center">0.002 (0.041)</td>
+<td align="center">0.003 (0.051)</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>VIRAL_CARDIOMYOPATHY</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">NaN</td>
+</tr>
+<tr class="even">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.000 (0.000)</td>
+<td align="center">0.000 (0.000)</td>
+<td align="center">0.000 (0.000)</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">   Range</td>
+<td align="center">0.000 - 0.000</td>
+<td align="center">0.000 - 0.000</td>
+<td align="center">0.000 - 0.000</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left"><strong>DILATED_CARDIOMYOPATHY</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.743</td>
+</tr>
+<tr class="odd">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.035 (0.184)</td>
+<td align="center">0.032 (0.176)</td>
+<td align="center">0.034 (0.181)</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>ALCOHOLIC_CARDIOMYOPATHY</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.690</td>
+</tr>
+<tr class="even">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.005 (0.072)</td>
+<td align="center">0.007 (0.082)</td>
+<td align="center">0.006 (0.076)</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left"><strong>ASA_00</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.210</td>
+</tr>
+<tr class="odd">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.643 (0.479)</td>
+<td align="center">0.674 (0.469)</td>
+<td align="center">0.655 (0.476)</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>WARFARIN_00</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.922</td>
+</tr>
+<tr class="even">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.288 (0.453)</td>
+<td align="center">0.285 (0.452)</td>
+<td align="center">0.287 (0.452)</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left"><strong>NOAC_00</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.160</td>
+</tr>
+<tr class="odd">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.082 (0.274)</td>
+<td align="center">0.062 (0.242)</td>
+<td align="center">0.074 (0.263)</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>APT_00</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.802</td>
+</tr>
+<tr class="even">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.223 (0.416)</td>
+<td align="center">0.228 (0.420)</td>
+<td align="center">0.225 (0.417)</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left"><strong>BB_00</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.168</td>
+</tr>
+<tr class="odd">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.801 (0.399)</td>
+<td align="center">0.829 (0.376)</td>
+<td align="center">0.812 (0.391)</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>ACE_ARB_00</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.002</td>
+</tr>
+<tr class="even">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.629 (0.483)</td>
+<td align="center">0.549 (0.498)</td>
+<td align="center">0.599 (0.490)</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left"><strong>AAD_CLASS_I_00</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.061</td>
+</tr>
+<tr class="odd">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.403 (0.491)</td>
+<td align="center">0.451 (0.498)</td>
+<td align="center">0.421 (0.494)</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>AAD_CLASS_III_00</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.781</td>
+</tr>
+<tr class="even">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.013 (0.115)</td>
+<td align="center">0.012 (0.108)</td>
+<td align="center">0.013 (0.113)</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left"><strong>INSULIN_00</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.170</td>
+</tr>
+<tr class="odd">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.225 (0.418)</td>
+<td align="center">0.255 (0.436)</td>
+<td align="center">0.236 (0.425)</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>METFORMIN_00</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.053</td>
+</tr>
+<tr class="even">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.174 (0.379)</td>
+<td align="center">0.137 (0.344)</td>
+<td align="center">0.160 (0.367)</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left"><strong>SGLT2_INHIBITORS_00</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.268</td>
+</tr>
+<tr class="odd">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.002 (0.045)</td>
+<td align="center">0.000 (0.000)</td>
+<td align="center">0.001 (0.036)</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 0.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>DPP4_INHIBTOR_00</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">0.903</td>
+</tr>
+<tr class="even">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.048 (0.213)</td>
+<td align="center">0.049 (0.216)</td>
+<td align="center">0.048 (0.214)</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left"><strong>TZD_00</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">NaN</td>
+</tr>
+<tr class="odd">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.000 (0.000)</td>
+<td align="center">0.000 (0.000)</td>
+<td align="center">0.000 (0.000)</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">   Range</td>
+<td align="center">0.000 - 0.000</td>
+<td align="center">0.000 - 0.000</td>
+<td align="center">0.000 - 0.000</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>GLP1_00</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">NaN</td>
+</tr>
+<tr class="even">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.000 (0.000)</td>
+<td align="center">0.000 (0.000)</td>
+<td align="center">0.000 (0.000)</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">   Range</td>
+<td align="center">0.000 - 0.000</td>
+<td align="center">0.000 - 0.000</td>
+<td align="center">0.000 - 0.000</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left"><strong>SULFONYLUREA_00</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">NaN</td>
+</tr>
+<tr class="odd">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.000 (0.000)</td>
+<td align="center">0.000 (0.000)</td>
+<td align="center">0.000 (0.000)</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">   Range</td>
+<td align="center">0.000 - 0.000</td>
+<td align="center">0.000 - 0.000</td>
+<td align="center">0.000 - 0.000</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>CTB</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">&lt; 0.001</td>
+</tr>
+<tr class="even">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.266 (0.442)</td>
+<td align="center">1.000 (0.000)</td>
+<td align="center">0.545 (0.498)</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">1.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left"><strong>in_CTB</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">&lt; 0.001</td>
+</tr>
+<tr class="odd">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.000 (0.000)</td>
+<td align="center">0.603 (0.490)</td>
+<td align="center">0.229 (0.420)</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">   Range</td>
+<td align="center">0.000 - 0.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>60_day_CTB</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">&lt; 0.001</td>
+</tr>
+<tr class="even">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.081 (0.273)</td>
+<td align="center">1.000 (0.000)</td>
+<td align="center">0.430 (0.495)</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">1.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left"><strong>90_day_CTB</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">&lt; 0.001</td>
+</tr>
+<tr class="odd">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.120 (0.325)</td>
+<td align="center">1.000 (0.000)</td>
+<td align="center">0.454 (0.498)</td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">1.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>1_year_CTB</strong></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="right">&lt; 0.001</td>
+</tr>
+<tr class="even">
+<td align="left">   Mean (SD)</td>
+<td align="center">0.227 (0.419)</td>
+<td align="center">1.000 (0.000)</td>
+<td align="center">0.521 (0.500)</td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">   Range</td>
+<td align="center">0.000 - 1.000</td>
+<td align="center">1.000 - 1.000</td>
+<td align="center">0.000 - 1.000</td>
+<td align="right"></td>
+</tr>
+</tbody>
+</table>
+
+
+<!-- rnb-html-end -->
+
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="day_ctb-label" class="section level1">
+<h1>30_day_CTB label</h1>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDAuMzc5OTc0M1xuIn0= -->
+<pre><code>[1] 0.3799743</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="post_vad-post_transplant-label" class="section level1">
+<h1>POST_VAD, POST_TRANSPLANT label</h1>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-output-begin eyJkYXRhIjoiICAgTWluLiAxc3QgUXUuICBNZWRpYW4gICAgTWVhbiAzcmQgUXUuICAgIE1heC4gXG4gIDIwLjAwICAgNDUuMDAgICA1Ni4wMCAgIDUxLjg2ICAgNjEuMDAgICA3MS4wMCBcbiJ9 -->
+<pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  20.00   45.00   56.00   51.86   61.00   71.00 </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-output-begin eyJkYXRhIjoiRXJyb3IgaW4gbWVhbihiYXNlbGluZS5yYXckQk1JLCBuYS5ybSA9IFRSVUUpIDogXG4gIG9iamVjdCAnYmFzZWxpbmUucmF3JyBub3QgZm91bmRcbiJ9 -->
+<pre><code>Error in mean(baseline.raw$BMI, na.rm = TRUE) : 
+  object &#39;baseline.raw&#39; not found</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-output-begin eyJkYXRhIjoiICBCUF9TWVNUT0xJQyAgICAgQlBfRElBU1RPTElDICAgICAgICBQVUxTRSAgICAgICBcbiBNaW4uICAgOiA2NS4wICAgTWluLiAgIDogNDAuMDAgICBNaW4uICAgOiAgOS4wMCAgXG4gMXN0IFF1LjoxMTAuMCAgIDFzdCBRdS46IDY0LjAwICAgMXN0IFF1LjogNjkuMjAgIFxuIE1lZGlhbiA6MTIyLjAgICBNZWRpYW4gOiA3MC4wMCAgIE1lZGlhbiA6IDc3LjIwICBcbiBNZWFuICAgOjEyMy41ICAgTWVhbiAgIDogNzIuMjMgICBNZWFuICAgOiA3OC44OCAgXG4gM3JkIFF1LjoxMzYuMCAgIDNyZCBRdS46IDgwLjAwICAgM3JkIFF1LjogODUuMDAgIFxuIE1heC4gICA6MjAyLjAgICBNYXguICAgOjEyNi4wMCAgIE1heC4gICA6MTU1LjAwICBcbiJ9 -->
+<pre><code>  BP_SYSTOLIC     BP_DIASTOLIC        PULSE       
+ Min.   : 65.0   Min.   : 40.00   Min.   :  9.00  
+ 1st Qu.:110.0   1st Qu.: 64.00   1st Qu.: 69.20  
+ Median :122.0   Median : 70.00   Median : 77.20  
+ Mean   :123.5   Mean   : 72.23   Mean   : 78.88  
+ 3rd Qu.:136.0   3rd Qu.: 80.00   3rd Qu.: 85.00  
+ Max.   :202.0   Max.   :126.00   Max.   :155.00  </code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 </div>
-<div id="add-of-admissions-and-of-30-day-readmissions-labels" class="section level1">
-<h1>Add “# of admissions” and “# of 30-day readmissions” labels</h1>
+<div id="kaplan-meier-curve" class="section level1">
+<h1>Kaplan Meier Curve</h1>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
+<!-- rnb-output-begin eyJkYXRhIjoiICAgTWluLiAxc3QgUXUuICBNZWRpYW4gICAgTWVhbiAzcmQgUXUuICAgIE1heC4gXG4gIDE4LjAwICAgNjMuMDAgICA3NC4wMCAgIDcyLjU5ICAgODQuMDAgIDEwNS4wMCBcbiJ9 -->
+<pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  18.00   63.00   74.00   72.59   84.00  105.00 </code></pre>
+<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-</div>
-<div id="prepare-the-attributes-dataframe" class="section level1">
-<h1>Prepare the attributes dataframe</h1>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-</div>
-<div id="identify-patients-in-each-traj-group" class="section level1">
-<h1>identify patients in each traj group</h1>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-</div>
-<div id="demographic-features" class="section level1">
-<h1>demographic features</h1>
-<p>AGE_ADMISSION, RACE, GENDER, TOBACCO_STATUS, INSURANCE_PAYER</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-</div>
-<div id="save-dataset" class="section level1">
-<h1>save dataset</h1>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
 <!-- rnb-chunk-end -->
@@ -1808,7 +3880,7 @@ summary {
 <!-- rnb-text-end -->
 </div>
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiUiBOb3RlYm9vayIKb3V0cHV0OiBodG1sX25vdGVib29rCi0tLQpgYGB7ciBnbG9iYWxfb3B0aW9ucywgaW5jbHVkZT1GQUxTRX0Ka25pdHI6Om9wdHNfY2h1bmskc2V0KGVjaG89RkFMU0UsIHdhcm5pbmc9RkFMU0UsIG1lc3NhZ2U9RkFMU0UpCmxpYnJhcnkocmVhZHhsKQpsaWJyYXJ5KHRpZHl2ZXJzZSkKYGBgCgoKIyBpbXBvcnQgZGF0YQpgYGB7cn0KZGYgPC0gcmVhZF9leGNlbCgifi9EZXNrdG9wL3RyaWFsIHNhdmUueGxzeCIsIHNoZWV0PSJTaGVldDEiKQpiYXNlbGluZS5kZiA8LSByZWFkX2V4Y2VsKCd+L0Rlc2t0b3AvZGF0YXNldHMvcHJvY2Vzc2VkL0dCVE1fZGF0YS9GaWx0ZXJlZCBCYXNlbGluZSBpbXB1dGVkLnhsc3gnLCBzaGVldCA9ICdTaGVldCAxJykKYWRtaXNzaW9uLmRmIDwtIHJlYWRfZXhjZWwoIi9Vc2Vycy9qaW5jaGVueGllL0Rlc2t0b3AvZGF0YXNldHMvcHJvY2Vzc2VkL0RhdGFfdjEueGxzeCIsIHNoZWV0ID0gImFkbWlzc2lvbl9hbGwiKQpzdGF0aWMuZmVhdHVyZXMgPC0gcmVhZF9leGNlbCgifi9EZXNrdG9wL2RhdGFzZXRzL3Byb2Nlc3NlZC9TdGF0aWMgQ2hhcmFjdGVyaXN0aWNzLnhsc3giLCBzaGVldCA9ICdzdGF0aWMnKQpgYGAKCiMgQWRkICIjIG9mIGFkbWlzc2lvbnMiIGFuZCAiIyBvZiAzMC1kYXkgcmVhZG1pc3Npb25zIiBsYWJlbHMKCmBgYHtyfQpsYWJlbHMuZGYuZnVsbCA8LSBhZG1pc3Npb24uZGYgJT4lIGdyb3VwX2J5KHJJRCkgJT4lIAogIHN1bW1hcmlzZSh0aW1lcy5hZG1pc3Npb24gPSBtYXgoYWRtaXNzaW9uX3RpbWVzKSwgdGltZXMuMzAucmVhZG1pdCA9IHN1bShyZWFkbWl0XzMwX2xhYmVsKSkgCgpsYWJlbHMuZGYgPC0gbGFiZWxzLmRmLmZ1bGxbd2hpY2gobGFiZWxzLmRmLmZ1bGwkcklEICVpbiUgZGYkcGF0aWVudHNpZCksXSAlPiUgc2VsZWN0KC1ySUQpCmxhYmVscy5kZi5mdWxsIDwtIGxhYmVscy5kZi5mdWxsICU+JSBzZWxlY3QoLXJJRCkKYGBgCgpgYGB7cn0KIyB1cGRhdGUuYmFzZWxpbmUuZGYgPC0gY2JpbmQoYmFzZWxpbmUuZGYsIGxhYmVscy5kZi5mdWxsKQpgYGAKCgoKCiMgUHJlcGFyZSB0aGUgYXR0cmlidXRlcyBkYXRhZnJhbWUKYGBge3J9CmJhc2UuZGYgPC0gYmFzZWxpbmUuZGZbd2hpY2goYmFzZWxpbmUuZGYkcklEICVpbiUgZGYkcGF0aWVudHNpZCksXQpzdGF0aWMuZGYgPC0gc3RhdGljLmZlYXR1cmVzW3doaWNoKHN0YXRpYy5mZWF0dXJlcyRySUQgJWluJSBkZiRwYXRpZW50c2lkKSxdCgoKIyBzZWxlY3QgZmVhdHVyZXMgZnJvbSAiU3RhdGljIENoYXJhY3RlcmlzdGljcy54bHN4IiwgZmVhdHVyZXMgaGFzIGJlZW4gZW5jb2RlZCBpbiBvbmUtaG90IHJlcHJlc2VudGF0aW9ucwphdHRyaXMuZGYuMSA8LSBzdGF0aWMuZGYgJT4lIHNlbGVjdCgiRkVNQUxFIiwgIlJBQ0VfV2hpdGUiLCBlbmRzX3dpdGgoIl9IU1QiKSwgc3RhcnRzX3dpdGgoIkhYXyIpLCBzdGFydHNfd2l0aCgiQ0NJXyIpLAogICAgICAgICAgICAgICAgIHN0YXJ0c193aXRoKCJUT0JBQ0NPXyIpLCBzdGFydHNfd2l0aCgiSU5TVVJfIiksIGVuZHNfd2l0aCgiX0NBUkRJT01ZT1BBVEhZIikpCmF0dHJpcy5kZi4xJENDSV9UT1RBTF9TQ09SRSA8LSBOVUxMICAgIyB3ZSBkb24ndCB3YW50IHRoZSBhbHRlcmVkIENDSV9UT1RBTF9TQ09SRSBmcm9tIHN0YXRpYyBkYXRhZnJhbWUKCgojIHNlbGVjdCBmZWF0dXJlcyBmcm9tIG9yaWdpbmFsICJGaWx0ZXJlZCBBdHRyaWJ1dGVzIEJhc2VsaW5lLnhsc3giCmF0dHJpcy5kZi4yIDwtIGJhc2UuZGYgJT4lIHNlbGVjdCgicklEIiwgIkFHRV9BRE1JU1NJT04iLCAiQ0NJX1RPVEFMX1NDT1JFIiwgc3RhcnRzX3dpdGgoIkJQXyIpLCAiUFVMU0UiLCAiQk1JIiwgZW5kc193aXRoKCJfMDAiKSwgIkNUQiIpIAoKYXR0cmlzLmRmIDwtIGNiaW5kKGF0dHJpcy5kZi4yLCBhdHRyaXMuZGYuMSwgbGFiZWxzLmRmKQoKCnJtKGJhc2VsaW5lLmRmLCBhZG1pc3Npb24uZGYsIHN0YXRpYy5mZWF0dXJlcywgYXR0cmlzLmRmLjEsIGF0dHJpcy5kZi4yLCBsYWJlbHMuZGYpCmBgYAoKCgojIGlkZW50aWZ5IHBhdGllbnRzIGluIGVhY2ggdHJhaiBncm91cApgYGB7cn0KZ3JvdXBzIDwtIHNvcnQodW5pcXVlKGRmJGBfdHJhal9Hcm91cGApKQpwYXQubWVtYmVyc2hpcCA8LSB2ZWN0b3IobW9kZT0ibGlzdCIsIGxlbmd0aCA9IGxlbmd0aChncm91cHMpKQpmb3IgKGdyb3VwIGluIGdyb3Vwcyl7CiAgcGF0Lm1lbWJlcnNoaXBbW2dyb3VwXV0gPC0gZGYkcGF0aWVudHNpZFt3aGljaChkZiRgX3RyYWpfR3JvdXBgPT1ncm91cCldCn0KYGBgCgoKCiMgZGVtb2dyYXBoaWMgZmVhdHVyZXMKQUdFX0FETUlTU0lPTiwgUkFDRSwgR0VOREVSLCBUT0JBQ0NPX1NUQVRVUywgSU5TVVJBTkNFX1BBWUVSCmBgYHtyfQojIHN1bW1hcnkoc3RhdGljLmZlYXR1cmVzJFJBQ0VfV2hpdGUpCm51bWVyaWMubGlzdCA8LSBjKCJuIiwiJW4iLCJBR0VfQURNSVNTSU9OIiwgInN0ZChBR0UpIiwgICJDQ0lfVE9UQUxfU0NPUkUiLCAic3RkKENDSV9TQ09SRSkiLCAiQlBfU1lTVE9MSUMiLCAic3RkKEJQX1NZU1RPTElDKSIsICJCUF9ESUFTVE9MSUMiLCAic3RkKEJQX0RJQVNUT0xJQykiLCAiUFVMU0UiLCAic3RkKFBVTFNFKSIsIkJNSSIsICJzdGQoQk1JKSIpCm51Lmxpc3QgPC0gYygiQUdFX0FETUlTU0lPTiIsICJDQ0lfVE9UQUxfU0NPUkUiLCAiQlBfU1lTVE9MSUMiLCAiQlBfRElBU1RPTElDIiwgIlBVTFNFIiwgIkJNSSIpCmJpbmFyeS5saXN0IDwtIGNvbG5hbWVzKGF0dHJpcy5kZilbLTFdCmJpbmFyeS5saXN0IDwtIGJpbmFyeS5saXN0WyFiaW5hcnkubGlzdCAlaW4lIG51Lmxpc3RdCmF0dHJpYnV0ZXMubGlzdCA8LSBjKG51bWVyaWMubGlzdCwgYmluYXJ5Lmxpc3QpCgoKcHJvZmlsZS5kZiA8LSBkYXRhLmZyYW1lKHJvdy5uYW1lcyA9IGdyb3VwcykKCgpmb3IgKGdyb3VwIGluIGdyb3Vwcyl7CiAgayA8LSAxCiAgcHJvZmlsZS5kZltncm91cCwgMV0gPC0gbGVuZ3RoKHBhdC5tZW1iZXJzaGlwW1tncm91cF1dKQogIHByb2ZpbGUuZGZbZ3JvdXAsIDJdIDwtIGxlbmd0aChwYXQubWVtYmVyc2hpcFtbZ3JvdXBdXSkvMTQ2OAogIGsgPC0gaysyCiAgZm9yICh2YWwgaW4gbnUubGlzdCl7CiAgICBwcm9maWxlLmRmW2dyb3VwLCBrXSA8LSBtZWFuKGF0dHJpcy5kZltbdmFsXV1bd2hpY2goYXR0cmlzLmRmJHJJRCAlaW4lIHBhdC5tZW1iZXJzaGlwW1tncm91cF1dKV0sIG5hLnJtID0gVFJVRSkKICAgIHByb2ZpbGUuZGZbZ3JvdXAsIGsrMV0gPC0gc2QoYXR0cmlzLmRmW1t2YWxdXVt3aGljaChhdHRyaXMuZGYkcklEICVpbiUgcGF0Lm1lbWJlcnNoaXBbW2dyb3VwXV0pXSwgbmEucm0gPSBUUlVFKQogICAgayA8LSBrKzIKICB9CiAgayA8LSAxNQogIGZvciAoYXR0cmkgaW4gYmluYXJ5Lmxpc3QpewogICAgIyBwcmludChhdHRyaSkKICAgIHByb2ZpbGUuZGZbZ3JvdXAsIGtdIDwtIHN1bShhdHRyaXMuZGZbW2F0dHJpXV1bd2hpY2goYXR0cmlzLmRmJHJJRCAlaW4lIHBhdC5tZW1iZXJzaGlwW1tncm91cF1dKV0sIG5hLnJtID0gVFJVRSkvbGVuZ3RoKHBhdC5tZW1iZXJzaGlwW1tncm91cF1dKQogICAgayA8LSBrKzEKICB9Cn0KCm5hbWVzKHByb2ZpbGUuZGYpIDwtIGF0dHJpYnV0ZXMubGlzdApwcm9maWxlLmRmIDwtIGNiaW5kKGdyb3VwcywgcHJvZmlsZS5kZikKCnJtKGssIHZhbCkKYGBgCgoKIyBzYXZlIGRhdGFzZXQKYGBge3J9CndyaXRlLnhsc3gocHJvZmlsZS5kZiwgJ34vRGVza3RvcC90cmFqIHByb2ZpbGUueGxzeCcsIGNvbC5uYW1lcyA9IFRSVUUsIHJvdy5uYW1lcyA9IEZBTFNFKQojIHdyaXRlLnhsc3godXBkYXRlLmJhc2VsaW5lLmRmLCAnfi9EZXNrdG9wL2RhdGFzZXRzL3Byb2Nlc3NlZC9GaWx0ZXJlZCBBdHRyaWJ1dGVzIEJhc2VsaW5lLnhsc3gnLCBjb2wubmFtZXMgPSBUUlVFLCByb3cubmFtZXMgPSBGQUxTRSkKYGBgCgoKYGBge3J9CmNvbC5saXN0IDwtIGMobnUubGlzdCwgYmluYXJ5Lmxpc3QpCmNvbC5saXN0LjEgPC0gY29sLmxpc3RbYygyNCwgNjE6NjcpXQpjb2wubGlzdC4yIDwtIGNvbC5saXN0WyFjb2wubGlzdCAlaW4lIGNvbC5saXN0LjFdCmBgYAoK</div>
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiUiBOb3RlYm9vayIKb3V0cHV0OiBodG1sX25vdGVib29rCi0tLQoKYGBge3IgZ2xvYmFsX29wdGlvbnMsIGluY2x1ZGU9RkFMU0V9CmtuaXRyOjpvcHRzX2NodW5rJHNldChlY2hvPUZBTFNFLCB3YXJuaW5nPUZBTFNFLCBtZXNzYWdlPUZBTFNFKQpsaWJyYXJ5KHRpZHl2ZXJzZSkKbGlicmFyeShrbml0cikKbGlicmFyeShyZWFkeGwpCmxpYnJhcnkob3Blbnhsc3gpCmxpYnJhcnkoZGF0YS50YWJsZSkKbGlicmFyeShIbWlzYykKbGlicmFyeShhcnNlbmFsKQojIGxpYnJhcnkoc3Vydml2YWwpCiMgbGlicmFyeShzdXJ2bWluZXIpCmxpYnJhcnkod3JpdGV4bCkKYGBgCgojIEltcG9ydCBkYXRhCgpgYGB7cn0Kc3RhdGljLmZlYXR1cmVzIDwtIHJlYWRfZXhjZWwoIn4vRGVza3RvcC9kYXRhc2V0cy9wcm9jZXNzZWQvU3RhdGljIENoYXJhY3RlcmlzdGljcy54bHN4Iiwgc2hlZXQgPSAnc3RhdGljJykKYmFzZWxpbmUuZGYgPC0gcmVhZF9leGNlbCgnfi9EZXNrdG9wL2RhdGFzZXRzL3Byb2Nlc3NlZC9GaWx0ZXJlZCBCYXNlbGluZSBpbXB1dGVkLnhsc3gnLCBzaGVldCA9ICdTaGVldCAxJykKYWRtaXNzaW9uLmRmIDwtIHJlYWRfZXhjZWwoIi9Vc2Vycy9qaW5jaGVueGllL0Rlc2t0b3AvZGF0YXNldHMvcHJvY2Vzc2VkL0ZpbHRlcmVkIEF0dHJpYnV0ZXMgQWRtaXNzaW9uIHYyLnhsc3giLCBzaGVldCA9ICdOQTMwX2ZpbHRlcmVkX2FkbWlzc2lvbicpCiMgYmFzZWxpbmUucmF3IDwtIHJlYWRfZXhjZWwoJy9Vc2Vycy9qaW5jaGVueGllL0Rlc2t0b3AvZGF0YXNldHMvcHJvY2Vzc2VkL0ZpbHRlcmVkIEF0dHJpYnV0ZXMgQmFzZWxpbmUueGxzeCcsIHNoZWV0ID0gJ05BMzBfZmlsdGVyZWRfYmFzZWxpbmUnKQpzZXJpZXMuZGYgPC0gcmVhZF9leGNlbCgnfi9EZXNrdG9wL2RhdGFzZXRzL3Byb2Nlc3NlZC9HQlRNX2RhdGEvY29tYmluZWQgZ2J0bSBzdGF0YSBkYXRhIHYyLnhsc3gnLCBzaGVldCA9ICdTaGVldCAxJykKIyBhZG1pc3Npb24ucmF3IDwtIHJlYWRfZXhjZWwoJy9Vc2Vycy9qaW5jaGVueGllL0Rlc2t0b3AvZGF0YXNldHMvSEYtQWRtaXNzaW9ucy54bHN4Jywgc2hlZXQgPSAnMDA0ODBfQWRtaXNzaW9uc18yMDIwMDExNV9OQScpCmBgYAoKKipwYXRpZW50IDk1OTcgaGFzIFBPU1RfVkFEID09MSBpbiBiYXNlbGluZS4gV2UgbW9kaWZpZWQgYWRtaXNzaW9uIHRvIG1hdGNoIGJhc2VsaW5lIHJlY29yZC4qKgpgYGB7cn0KYWRtaXNzaW9uLmRmW3doaWNoKChhZG1pc3Npb24uZGYkcklEID09IDk1OTcpJihhZG1pc3Npb24uZGYkbGFzdF9hZG09PTEpKSxdJFBPU1RfVkFEIDwtIDEKYGBgCgoKYGBge3J9CnJpZCA8LSBzZXJpZXMuZGYkcGF0aWVudHNfaWQKYGBgCgoqKldlIHdhbnQgdG8gcHJvZmlsZSB0aGVzZSAxNDY4IHBhdGllbnRzIHRvZ2V0aGVyIGZpcnN0LioqCgojIFNhdmUgdGhlIEZVTEwgY29ob3J0IGJhc2VsaW5lIGFuZCBhZG1pc3Npb24KCkZ1bGwgY29ob3J0OiAxNTU4IHBhdGllbnRzCgpgYGB7cn0KYmFzZWxpbmUuc3ViIDwtIGJhc2VsaW5lLmRmW3doaWNoKGJhc2VsaW5lLmRmJHJJRCAlaW4lIHJpZCksXQpzdGF0aWMuc3ViIDwtIHN0YXRpYy5mZWF0dXJlc1t3aGljaChzdGF0aWMuZmVhdHVyZXMkcklEICVpbiUgcmlkKSxdCnN0YXRpYy5zdWIgPC0gc3RhdGljLnN1YlssLWMoMSldCnN0YXRpYy5zdWIgPC0gc3RhdGljLnN1YiAlPiUgc2VsZWN0KC1GRU1BTEUsIC1zdGFydHNfd2l0aCgiSFhfIiksIC1lbmRzX3dpdGgoIl9IU1QiKSwgLXN0YXJ0c193aXRoKCJDQ0lfIiksIC1lbmRzX3dpdGgoIl9DQVJESU9NWU9QQVRIWSIpKQpuYW1lcyhzdGF0aWMuc3ViKVtuYW1lcyhzdGF0aWMuc3ViKSA9PSAiQUdFX0FETUlTU0lPTiJdIDwtICJOb3JtYWxpemVkX0FnZSIKZnVsbC5iYXNlbGluZSA8LSBjYmluZChiYXNlbGluZS5zdWIsIHN0YXRpYy5zdWIpCgphZG1pc3Npb24uc3ViIDwtIGFkbWlzc2lvbi5kZlt3aGljaChhZG1pc3Npb24uZGYkcklEICVpbiUgcmlkKSxdCmBgYAoKCmBgYHtyfQpsaXN0LmRmIDwtIGxpc3QoImJhc2VsaW5lIiA9IGZ1bGwuYmFzZWxpbmUsICJhZG1pc3Npb24iID0gYWRtaXNzaW9uLnN1YikKd3JpdGUueGxzeChsaXN0LmRmLCAnfi9EZXNrdG9wL2RhdGFzZXRzL3Byb2Nlc3NlZC9HQlRNX2RhdGEvZ2J0bSBDb2hvcnQgZGF0YSBjb21iaW5lZC54bHN4JywgY29sLm5hbWVzID0gVFJVRSwgcm93Lm5hbWVzID0gRkFMU0UpCmBgYAoKIyBQcm9maWxpbmcKCmBgYHtyfQpkZiA8LSByZWFkX2V4Y2VsKCJ+L0Rlc2t0b3AvdHJpYWwgc2F2ZS54bHN4Iiwgc2hlZXQ9IlNoZWV0MSIpCgpiYXNlbGluZS5kYXRhIDwtIGNiaW5kKGZ1bGwuYmFzZWxpbmUsIGFkbWlzc2lvbi5yZWxldmFudCwgZGYkYF90cmFqX0dyb3VwYCkKbmFtZXMoYmFzZWxpbmUuZGF0YSlbbmFtZXMoYmFzZWxpbmUuZGF0YSkgPT0gImRmJGBfdHJhal9Hcm91cGAiXSA8LSAiR3JvdXAiCgp0ZW1wIDwtIGJhc2VsaW5lLmRhdGEgJT4lIHNlbGVjdChHcm91cCwgbGlzdC5hdHRyaXMpCgp0YWJsZS4xIDwtIHRhYmxlYnkoR3JvdXAgfiAuLCBkYXRhID0gdGVtcCkKc3VtbWFyeSh0YWJsZS4xKQp0ZW1wLnRhYiA8LSBhcy5kYXRhLmZyYW1lKHN1bW1hcnkodGFibGUuMSkpCgojIHJlbmFtZSBmaXJzdCBjb2x1bW4KCnRlbXAudGFiIDwtIHRlbXAudGFiWy13aGljaCh0ZW1wLnRhYlssMV09PSImbmJzcDsmbmJzcDsmbmJzcDtSYW5nZSIpLF0KdGVtcC50YWIgPC0gdGVtcC50YWJbLXdoaWNoKHRlbXAudGFiWywxXT09IiZuYnNwOyZuYnNwOyZuYnNwO01lYW4gKFNEKSIpLF0KCnRlbXAudGFiLmZpbHRlcmVkIDwtIHRlbXAudGFiW3doaWNoKHRlbXAudGFiJGBwIHZhbHVlYCA8PSAwLjA1KSxdCnRlbXAudGFiLmZpbHRlcmVkIDwtIHRlbXAudGFiLmZpbHRlcmVkWy13aGljaChhcy5jaGFyYWN0ZXIodGVtcC50YWIuZmlsdGVyZWQkYHAgdmFsdWVgKT09IiBOYU4iKSxdCgpWaWV3KHRlbXAudGFiLmZpbHRlcmVkKQojIHRlbXAudGFiW3doaWNoKHRlbXAudGFiWywxXT09IiZuYnNwOyZuYnNwOyZuYnNwO01lYW4gKFNEKSIpLCAxXSA8LSAiTWVhbiAoU0QpIgojIHdyaXRlX3hsc3godGVtcC50YWIsIn4vRGVza3RvcC90ZW1wLnhsc3giKQpgYGAKCgojIENUQiBsYWJlbAoKCmBgYHtyfQp0ZW1wIDwtIGZ1bGwuYmFzZWxpbmUgJT4lIHNlbGVjdChsaXN0LmF0dHJpc1sxOjk2XSkKCnRhYmxlLjEgPC0gdGFibGVieShgQ1RCYCB+IC4sIGRhdGEgPSB0ZW1wKQpzdW1tYXJ5KHRhYmxlLjEpCnRlbXAudGFiIDwtIGFzLmRhdGEuZnJhbWUoc3VtbWFyeSh0YWJsZS4xKSkKCnRlbXAudGFiIDwtIHRlbXAudGFiWy13aGljaCh0ZW1wLnRhYlssMV09PSImbmJzcDsmbmJzcDsmbmJzcDtSYW5nZSIpLF0KdGVtcC50YWJbd2hpY2godGVtcC50YWJbLDFdPT0iJm5ic3A7Jm5ic3A7Jm5ic3A7TWVhbiAoU0QpIiksIDFdIDwtICJNZWFuIChTRCkiClZpZXcodGVtcC50YWIpCgojIHdyaXRlX3hsc3godGVtcC50YWIsIn4vRGVza3RvcC90ZW1wLnhsc3giKQoKYGBgCgoKCiMgMzBfZGF5X0NUQiBsYWJlbAoKYGBge3J9CmJhc2VsaW5lLjMwY3RiLjEgPC0gYmFzZWxpbmUuc3ViW3doaWNoKGJhc2VsaW5lLnN1YiRgMzBfZGF5X0NUQmAgPT0xKSxdCmJhc2VsaW5lLjMwY3RiLjAgPC0gYmFzZWxpbmUuc3ViW3doaWNoKGJhc2VsaW5lLnN1YiRgMzBfZGF5X0NUQmAgPT0wKSxdCgpkaW0oYmFzZWxpbmUuMzBjdGIuMSlbMV0vZGltKGJhc2VsaW5lLnN1YilbMV0KCnN0YXRpYy4zMGN0Yi4xIDwtIHN0YXRpYy5mZWF0dXJlc1t3aGljaChzdGF0aWMuZmVhdHVyZXMkcklEICVpbiUgYmFzZWxpbmUuMzBjdGIuMSRySUQpLF0Kc3RhdGljLjMwY3RiLjAgPC0gc3RhdGljLmZlYXR1cmVzW3doaWNoKHN0YXRpYy5mZWF0dXJlcyRySUQgJWluJSBiYXNlbGluZS4zMGN0Yi4wJHJJRCksXQpgYGAKCmBgYHtyfQpzdW1tYXJ5KGJhc2VsaW5lLjMwY3RiLjAkQUdFX0FETUlTU0lPTikKc3VtbWFyeShiYXNlbGluZS4zMGN0Yi4xJEFHRV9BRE1JU1NJT04pCgpzdGF0aWMuMzBjdGIuMCAlPiUgc2VsZWN0KFJBQ0VfV2hpdGUsIEZFTUFMRSwgc3RhcnRzX3dpdGgoIlRPQkFDQ09fIiksIHN0YXJ0c193aXRoKCJJTlNVUl8iKSkgJT4lIHN1bW1hcnkoKQpiYXNlbGluZS4zMGN0Yi4wICU+JSBzZWxlY3QoUE9TVF9DUlQsIFBPU1RfVkFELCBQT1NUX1RSQU5TUExBTlQpICU+JSBzdW1tYXJ5KCkKYGBgCgoKIyBQT1NUX1ZBRCwgUE9TVF9UUkFOU1BMQU5UIGxhYmVsCgpgYGB7cn0Kc3VtbWFyeShiYXNlbGluZS5zdWJbd2hpY2goYmFzZWxpbmUuc3ViJFBPU1RfVFJBTlNQTEFOVD09MSksXSRBR0VfQURNSVNTSU9OKQpgYGAKCgoKYGBge3J9CnRlbXAgPC0gYmFzZWxpbmUuc3ViICU+JSBzZWxlY3QoUE9TVF9UUkFOU1BMQU5ULCAgZW5kc193aXRoKCJfSFNUIiksIHN0YXJ0c193aXRoKCJIWF8iKSkKCnRhYmxlLjEgPC0gdGFibGVieShQT1NUX1RSQU5TUExBTlQgfiAuLCBkYXRhID0gdGVtcCkKc3VtbWFyeSh0YWJsZS4xKQpgYGAKCmBgYHtyfQptZWFuKGJhc2VsaW5lLnJhdyRCTUksIG5hLnJtID0gVFJVRSkKbWVhbihiYXNlbGluZS5kZiRCTUkpCm1lYW4oYmFzZWxpbmUuc3ViJEJNSSkKCgptZWFuKGJhc2VsaW5lLnJhdyRQVUxTRSwgbmEucm0gPSBUUlVFKQptZWFuKGJhc2VsaW5lLmRmJFBVTFNFKQptZWFuKGJhc2VsaW5lLnN1YiRQVUxTRSkKYGBgCgpgYGB7cn0KYmFzZWxpbmUuc3ViICU+JSAgc2VsZWN0KEJQX1NZU1RPTElDLCBCUF9ESUFTVE9MSUMsIFBVTFNFKSAlPiUgCiAgc3VtbWFyeSgpCmJhc2VsaW5lLnN1Ylt3aGljaChiYXNlbGluZS5zdWIkQ1RCPT0xKSxdICU+JSBzZWxlY3QoQlBfU1lTVE9MSUMsIEJQX0RJQVNUT0xJQywgUFVMU0UpICU+JSAKICBzdW1tYXJ5KCkKYGBgCgojIEthcGxhbiBNZWllciBDdXJ2ZQpgYGB7cn0KYWRtaXNzaW9uLnJhdy5zdWIgPC0gYWRtaXNzaW9uLnJhd1t3aGljaChhZG1pc3Npb24ucmF3JHJJRCAlaW4lIGJhc2VsaW5lLnN1YiRySUQpLF0gJT4lIHNlbGVjdChySUQsIEFHRV9BRE1JU1NJT04pCmthcG0uZGYgPC0gYmFzZWxpbmUuc3ViICU+JSBzZWxlY3QocklELCBDb3JyZWN0ZWRfRm9sbG93dXBfRGF5cywgQ1RCLCBQT1NUX1ZBRCwgUE9TVF9UUkFOU1BMQU5UKQoKc3Vydl9vYmplY3QgPC0gU3Vydih0aW1lID0ga2FwbS5kZiRDb3JyZWN0ZWRfRm9sbG93dXBfRGF5cywgZXZlbnQgPSBrYXBtLmRmJENUQikKZml0MSA8LSBzdXJ2Zml0KHN1cnZfb2JqZWN0IH4gUE9TVF9WQUQsIGRhdGEgPSBrYXBtLmRmKQpmaXQyIDwtICBzdXJ2Zml0KHN1cnZfb2JqZWN0IH4gUE9TVF9UUkFOU1BMQU5ULCBkYXRhID0ga2FwbS5kZikKYGBgCgpgYGB7cn0Kc3Vydm1pbmVyOjpnZ3N1cnZwbG90KGZpdDEsIGRhdGEgPSBrYXBtLmRmLCBwdmExID0gVFJVRSwgeGxhYiA9ICJGb2xsb3cgdXAgZGF5cyIpCnN1cnZtaW5lcjo6Z2dzdXJ2cGxvdChmaXQyLCBkYXRhID0ga2FwbS5kZiwgcHZhMSA9IFRSVUUsIHhsYWIgPSAiRm9sbG93IHVwIGRheXMiKQpgYGAKCmBgYHtyfQpkaW0oYWRtaXNzaW9uLmRmKQpkaW0oYWRtaXNzaW9uLnN1YikKCgphZG1pc3Npb24uZGYgJT4lIGdyb3VwX2J5KGFkbWlzc2lvbl9jb3VudCkgJT4lIGNvdW50KCkKdGVtcDEgPC0gYWRtaXNzaW9uLnN1YiAlPiUgZ3JvdXBfYnkoYWRtaXNzaW9uX2NvdW50KSAlPiUgY291bnQoKQoKd3JpdGVfeGxzeCh0ZW1wMSwifi9EZXNrdG9wL3RlbXAueGxzeCIpCmBgYAoKCgo=</div>
 
 
 
@@ -1855,7 +3927,7 @@ $(document).ready(function () {
 <!-- code folding -->
 <script>
 $(document).ready(function () {
-  window.initializeSourceEmbed("traj group profiling.Rmd");
+  window.initializeSourceEmbed("cohort profiling w: labels.Rmd");
   window.initializeCodeFolding("show" === "show");
 });
 </script>
