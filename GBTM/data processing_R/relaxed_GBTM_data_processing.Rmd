@@ -1,0 +1,757 @@
+---
+title: "Relaxed Selection of Cohort - GBTM Data Processing"
+output: html_notebook
+---
+# library
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(echo=FALSE, warning=FALSE, message=FALSE)
+library(tidyverse)
+library(knitr)
+library(data.table)  #for transpose() function
+library(reshape2)
+library(openxlsx)
+# library(Hmisc)
+```
+
+# DATA import
+```{r}
+admission_30NA <- readxl::read_excel("~/Desktop/HF_Research/datasets/processed/Filtered Attributes Admission v2.xlsx", sheet = 'Sheet 1')
+baseline.df <- readxl::read_excel('~/Desktop/HF_research/datasets/processed/Filtered Baseline imputed.xlsx', sheet = 'Sheet 1')
+# baseline.profile.df is combined with one-hot encoded categorical variables
+baseline.profile.df <- readxl::read_excel("/Users/jinchenxie/Desktop/HF_Research/datasets/processed/All Baseline Attributes combined.xlsx", sheet = 'Sheet 1')
+
+raw.baseline <- readxl::read_excel("/Users/jinchenxie/Desktop/datasets/processed/Filtered Attributes Baseline.xlsx")
+raw.admission <- readxl::read_excel("/Users/jinchenxie/Desktop/datasets/HF-Admissions.xlsx")
+vad.baseline <- readxl::read_excel("/Users/jinchenxie/Desktop/datasets/processed/VAD potential cohort admissions V2.xlsx")
+```
+
+```{r}
+temp <- vad.baseline %>% group_by(rID) %>% summarise(count = n())
+temp[temp$count>15,]
+```
+
+
+
+## preprocessing
+```{r}
+names(admission_30NA)[names(admission_30NA) == "READMISSION_DAYS"] <- "DAYS_READMISSION"
+
+admission_lab <- 
+  select(admission_30NA, -ends_with("_DAYS")) %>% 
+  select(rID, admission_count, WBC:HCT)
+
+admission_procedure <- admission_30NA %>% 
+  select(rID, admission_count, POST_VAD, POST_TRANSPLANT, CABG, PCI, IABP, ABLATION, PACEMAKER_IMPLANT, ICD_IMPLANT, BIV_ICD_IMPLANT)
+
+names(admission_lab)[names(admission_lab) == "NA"] <- "N_A"
+
+# admission_lab$DAYS_READMISSION[which(is.na(admission_lab$DAYS_READMISSION))] <- 0
+```
+
+**We only consider admissions upto the 15th admission of each patient. And only patients who had at least 3 admissions.**
+
+# functions 
+
+```{r functions}
+generate_col_names <- function(measure_name, patients_id){
+  col_names <- c()
+  for (val in patients_id){
+    col_names <- append(col_names, paste(measure_name, val, sep="_"))
+  }
+ return(col_names) 
+}
+
+measurement_df <- function(original_df, new.df, measure_name, patients_id){
+  col.names <- generate_col_names(measure_name, patients_id)
+  names(new.df) <- col.names
+  
+  for (val in seq(1, length(patients_id))){
+    temp_c <- original_df[[measure_name]][which(original_df$rID == patients_id[val])]
+    new.df[[col.names[val]]] <- c(temp_c, rep(NA, nrow(new.df)-length(temp_c)))
+  }
+  
+  return(new.df)
+}
+
+change_col_names <- function(prefix, num_adms){
+  col_names <- c()
+  for (val in seq(1, num_adms)){
+    col_names <- append(col_names, paste(prefix, val, sep="_"))
+  }
+  return(col_names)
+}
+
+
+shape_transformation <- function(measure_name, original_df, num_adms, prefix){
+  patients_id <- unique(original_df$rID)
+  new.df <- data.frame(matrix(ncol = length(patients_id), nrow = num_adms))
+  new.df <- measurement_df(original_df, new.df, measure_name, patients_id)
+  new.df.t <- data.table::transpose(new.df)
+  names(new.df.t) <- change_col_names(prefix, num_adms)
+  new.df.t <- cbind(patients_id, new.df.t)
+  return(new.df.t)
+}
+
+numreadings_criteria <- function(measure_name, original_df){
+  list_remove <- c()
+  rid.list <- unique(original_df$rID)
+  for (id in rid.list){
+    sub.df <- original_df[which(original_df$rID == id),]
+    
+    num.exist <- dim(sub.df[-which(is.na(sub.df[[measure_name]])),])[1]
+    num.na <- dim(sub.df[which(is.na(sub.df[[measure_name]])),])[1]
+  
+    if (((num.exist<3) & (num.na!=0)) | (dim(sub.df)[1]<3)){
+      list_remove <- c(list_remove, id)
+    }else{
+      next
+    }
+  }
+  after.df <- original_df[-which(original_df$rID %in% list_remove),]
+  return(after.df)
+}
+
+T_transform <- function(num_adms, df){
+  time.df <- data.frame(matrix(ncol = dim(df)[1], nrow = num_adms))
+  for (val in seq(1, dim(df)[1])){
+    time.df[[names(time.df)[val]]] <- seq(1, num_adms)
+  }
+  time.df.t <- data.table::transpose(time.df)
+  names(time.df.t) <- change_col_names('T', num_adms)
+  return(time.df.t)
+}
+
+generate_gbtm_df <- function(measure_name, prefix, original_df, num_adms){
+  criteria.admission <- numreadings_criteria(measure_name, original_df)
+  lab.t <- shape_transformation(measure_name, criteria.admission, num_adms, prefix)
+  time.t <- T_transform(num_adms, lab.t)
+  combined <- cbind(lab.t, time.t)
+
+  returnList <- list("labs" = lab.t, "combined" = combined)
+  return(returnList)
+}
+
+generate_gbtm_df_2 <- function(measure_name, prefix, original_df, num_adms){
+  lab.t <- shape_transformation(measure_name, original_df, num_adms, prefix)
+  time.t <- T_transform(num_adms, lab.t)
+  combined <- cbind(lab.t, time.t)
+
+  returnList <- list("labs" = lab.t, "combined" = combined)
+  return(returnList)
+}
+
+```
+
+
+**Update: we don't need to remove values that are very small or big comparing to others (outliers). We only need to remove values that are highly likely to be small or big due to recording errors. The cnorm model in STATA can censored outliers.**
+
+# HGB
+```{r set measurement name}
+measure = "HGB"
+```
+
+*Decide if remove any abnormal values*
+```{r}
+# summary(admission_lab$HGB)
+# ggplot(data = admission.hgb, aes(HGB)) + geom_histogram()
+admission.hgb <- admission_lab
+```
+
+## upto 15th admission
+```{r}
+# output <- generate_gbtm_df(measure, measure, admission.hgb, num_adms =  15)
+# hgb.df.t.15 <- output$combined
+# hgb.15 <- output$labs
+```
+
+## upto 10th admission
+```{r}
+admission.hgb <- admission.hgb[which(admission.hgb$admission_count <= 10),]
+output <- generate_gbtm_df(measure, measure, admission.hgb, num_adms =  10)
+hgb.df.t.10 <- output$combined
+hgb.10 <- output$labs
+
+
+# data availability
+# In total, the data availability
+1-sum(is.na(hgb.10))/prod(dim(hgb.10))
+# On average, each patient we have ___% of measurements of all of his or her relevant quarters.
+1-mean(colMeans(is.na(data.table::transpose(hgb.10[,-1]))))
+```
+
+## upto 8th admission
+```{r}
+# admission.hgb <- admission.hgb[which(admission.hgb$admission_count <= 8),]
+# output <- generate_gbtm_df(measure, measure, admission.hgb, num_adms =  8)
+# hgb.df.t.8 <- output$combined
+# hgb.8 <- output$labs
+```
+
+```{r}
+# hgb.dfs <- list("adms_15"=hgb.df.t.15, "adms_10" = hgb.df.t.10, "adms_8"=hgb.df.t.8)
+# write.xlsx(hgb.dfs, '~/Desktop/datasets/processed/GBTM_data/HGB data.xlsx', col.names = TRUE, row.names = FALSE)
+rm(output, admission.hgb)
+```
+
+# eGFR
+
+```{r}
+measure <- "EGFR"
+```
+
+*Decide if remove any abnormal data*
+```{r}
+admission.egfr <- admission_lab
+# summary(admission.egfr$EGFR)
+# ggplot(data = admission.egfr, aes(EGFR)) + geom_histogram()
+admission.egfr[[measure]][which(admission_lab[[measure]]> 400)]  <- NA_real_
+```
+
+## upto 15th admission
+```{r}
+# output <- generate_gbtm_df(measure, measure, admission.egfr, num_adms =  15)
+# egfr.df.t.15 <- output$combined
+# egfr.15 <- output$labs
+```
+## upto 10th admission
+```{r}
+admission.egfr <- admission.egfr[which(admission.egfr$admission_count <= 10),]
+output <- generate_gbtm_df(measure, measure, admission.egfr, num_adms =  10)
+
+egfr.df.t.10 <- output$combined
+egfr.10 <- output$labs
+
+
+# data availability
+# In total, the data availability
+1-sum(is.na(egfr.10))/prod(dim(egfr.10))
+# On average, each patient we have ___% of measurements of all of his or her relevant quarters.
+1-mean(colMeans(is.na(data.table::transpose(egfr.10[,-1]))))
+```
+## upto 8th admission
+```{r}
+# admission.egfr <- admission.egfr[which(admission.egfr$admission_count <= 8),]
+# output <- generate_gbtm_df(measure, measure, admission.egfr, num_adms = 8)
+# egfr.df.t.8 <- output$combined
+# egfr.8 <- output$labs
+```
+
+```{r}
+# egfr.dfs <- list("adms_15"=egfr.df.t.15, "adms_10" = egfr.df.t.10, "adms_8"=egfr.df.t.8)
+# write.xlsx(egfr.dfs, '~/Desktop/datasets/processed/GBTM_data/EGFR data.xlsx', col.names = TRUE, row.names = FALSE)
+rm(output, admission.egfr)
+```
+
+# NA 
+Sodium
+
+```{r}
+measure <- "N_A"
+```
+
+*Decide if remove any outlier*
+```{r}
+admission.na <- admission_lab
+# summary(admission_lab$N_A)
+# ggplot(data = admission.na, aes(N_A)) + geom_histogram()
+# admission.egfr[[measure]][which(admission_lab[[measure]]> 150)]  <- NA_real_
+```
+
+## upto 15th admission
+```{r}
+# output <- generate_gbtm_df(measure, measure, admission.na, num_adms =  15)
+# na.df.t.15 <- output$combined
+# na.15 <- output$labs
+```
+## upto 10th admission
+```{r}
+admission.na <- admission.na[which(admission.na$admission_count <= 10),]
+output <- generate_gbtm_df(measure, measure, admission.na, num_adms =  10)
+
+na.df.t.10 <- output$combined
+na.10 <- output$labs
+
+# data availability
+# In total, the data availability
+1-sum(is.na(na.10))/prod(dim(na.10))
+# On average, each patient we have ___% of measurements of all of his or her relevant quarters.
+1-mean(colMeans(is.na(data.table::transpose(na.10[1:4,-1]))))
+```
+## upto 8th admission
+```{r}
+# admission.na <- admission.na[which(admission.na$admission_count <= 8),]
+# output <- generate_gbtm_df(measure, measure, admission.na, num_adms = 8)
+# na.df.t.8 <- output$combined
+# na.8 <- output$labs
+```
+
+```{r}
+# na.dfs <- list("adms_15"=na.df.t.15, "adms_10" = na.df.t.10, "adms_8"=na.df.t.8)
+# write.xlsx(na.dfs, '~/Desktop/datasets/processed/GBTM_data/NA data.xlsx', col.names = TRUE, row.names = FALSE)
+rm(output, admission.na)
+```
+
+# Glucose
+
+```{r}
+measure <- "GLUCOSE"
+```
+
+*Decide if remove any outlier*
+```{r}
+admission.glucose <- admission_lab
+# summary(admission.glucose$GLUCOSE)
+# ggplot(data = admission.glucose, aes(GLUCOSE)) + geom_histogram()
+admission.glucose[[measure]][which(admission.glucose[[measure]] > 750)]  <- NA_real_
+```
+
+
+## upto 15th admission
+```{r}
+# output <- generate_gbtm_df(measure, measure, admission.glucose, num_adms =  15)
+# glucose.df.t.15 <- output$combined
+# na.15 <- output$labs
+```
+## upto 10th admission
+```{r}
+admission.glucose <- admission.glucose[which(admission.glucose$admission_count <= 10),]
+output <- generate_gbtm_df(measure, measure, admission.glucose, num_adms =  10)
+
+glucose.df.t.10 <- output$combined
+glucose.10 <- output$labs
+
+# data availability
+# In total, the data availability
+1-sum(is.na(glucose.10))/prod(dim(glucose.10))
+# On average, each patient we have ___% of measurements of all of his or her relevant quarters.
+1-mean(colMeans(is.na(data.table::transpose(glucose.10[,-1]))))
+```
+
+
+## upto 8th admission
+```{r}
+# admission.glucose <- admission.glucose[which(admission.glucose$admission_count <= 8),]
+# output <- generate_gbtm_df(measure, measure, admission.glucose, num_adms =  8)
+# 
+# glucose.df.t.8 <- output$combined
+# glucose.8 <- output$labs
+```
+
+```{r}
+# glucose.dfs <- list("adms_15"=glucose.df.t.15, "adms_10" = glucose.df.t.10, "adms_8" = glucose.df.t.8)
+# write.xlsx(glucose.dfs, '~/Desktop/datasets/processed/GBTM_data/GLUCOSE data.xlsx', col.names = TRUE, row.names = FALSE)
+rm(output, admission.glucose)
+```
+
+
+# Platelets
+
+```{r}
+measure = "PLATELETS"
+admission.platelets <- admission_lab
+summary(admission_lab$PLATELETS)
+# ggplot(data = admission.platelets, aes(PLATELETS)) + geom_histogram()
+# admission.platelets[[measure]][which(admission.platelets[[measure]] > 600)]  <- NA_real_
+```
+
+## upto 15th admission
+```{r}
+# output <- generate_gbtm_df(measure, measure, admission.platelets, num_adms =  15)
+# platelets.df.t.15 <- output$combined
+# na.15 <- output$labs
+```
+
+## upto 10th admission
+```{r}
+admission.platelets <- admission.platelets[which(admission.platelets$admission_count <= 10),]
+output <- generate_gbtm_df(measure, measure, admission.platelets, num_adms =  10)
+
+platelets.df.t.10 <- output$combined
+platelets.10 <- output$labs
+
+# data availability
+# In total, the data availability
+1-sum(is.na(platelets.10))/prod(dim(platelets.10))
+# On average, each patient we have ___% of measurements of all of his or her relevant quarters.
+1-mean(colMeans(is.na(data.table::transpose(platelets.10[,-1]))))
+```
+
+```{r}
+# platelets.dfs <- list("adms_15"=platelets.df.t.15, "adms_10" = platelets.df.t.10)
+# write.xlsx(platelets.dfs, '~/Desktop/datasets/processed/GBTM_data/PLATELETS data.xlsx', col.names = TRUE, row.names = FALSE)
+rm(output, admission.platelets)
+```
+
+# K
+
+```{r}
+measure = "K"
+admission.k <- admission_lab
+# summary(admission_lab$K)
+# ggplot(data = admission.k, aes(K)) + geom_histogram()
+# admission.k[[measure]][which(admission.k[[measure]] > 7.5)]  <- NA_real_
+```
+
+## upto 15th admission
+```{r}
+# output <- generate_gbtm_df(measure, measure, admission.k, num_adms =  15)
+# k.df.t.15 <- output$combined
+# na.15 <- output$labs
+```
+
+## upto 10th admission
+```{r}
+admission.k <- admission.k[which(admission.k$admission_count <= 10),]
+output <- generate_gbtm_df(measure, measure, admission.k, num_adms =  10)
+
+k.df.t.10 <- output$combined
+k.10 <- output$labs
+
+# data availability
+# In total, the data availability
+1-sum(is.na(k.10))/prod(dim(k.10))
+# On average, each patient we have ___% of measurements of all of his or her relevant quarters.
+1-mean(colMeans(is.na(data.table::transpose(k.10[,-1]))))
+```
+
+```{r}
+# k.dfs <- list("adms_15"=k.df.t.15, "adms_10" = k.df.t.10)
+# write.xlsx(k.dfs, '~/Desktop/datasets/processed/GBTM_data/K data.xlsx', col.names = TRUE, row.names = FALSE)
+rm(output, admission.k)
+```
+
+
+# WBC
+
+```{r}
+measure = "WBC"
+admission.wbc <- admission_lab
+# summary(admission_lab$PLATELETS)
+# ggplot(data = admission.wbc, aes(WBC)) + geom_histogram()
+admission.wbc[[measure]][which(admission.wbc[[measure]] > 50)]  <- NA_real_
+# ggplot(data = admission.wbc, aes(WBC)) + geom_histogram()
+```
+
+## upto 15th admission
+```{r}
+# output <- generate_gbtm_df(measure, measure, admission.wbc, num_adms =  15)
+# wbc.df.t.15 <- output$combined
+# na.15 <- output$labs
+```
+
+## upto 10th admission
+```{r}
+admission.wbc <- admission.wbc[which(admission.wbc$admission_count <= 10),]
+output <- generate_gbtm_df(measure, measure, admission.wbc, num_adms =  10)
+
+wbc.df.t.10 <- output$combined
+wbc.10 <- output$labs
+
+# data availability
+# In total, the data availability
+1-sum(is.na(wbc.10))/prod(dim(wbc.10))
+# On average, each patient we have ___% of measurements of all of his or her relevant quarters.
+1-mean(colMeans(is.na(data.table::transpose(wbc.10[,-1]))))
+```
+
+```{r}
+# wbc.dfs <- list("adms_15"=wbc.df.t.15, "adms_10" = wbc.df.t.10)
+# write.xlsx(wbc.dfs, '~/Desktop/datasets/processed/GBTM_data/WBC data.xlsx', col.names = TRUE, row.names = FALSE)
+rm(output, admission.wbc)
+```
+
+# Save a combined dataset
+```{r}
+combined.labs.rids <- union(hgb.df.t.10$patients_id, union(union(egfr.10$patients_id, na.10$patients_id), union(wbc.10$patients_id, k.10$patients_id)))
+combined.labs.rids <- union(combined.labs.rids, union(platelets.10$patients_id, glucose.df.t.10$patients_id))
+
+admission.union <- admission_lab[which(admission_lab$rID %in% combined.labs.rids),]
+admission.union <- admission.union[which(admission.union$admission_count <= 10),]
+
+admission.union[["EGFR"]][which(admission.union[["EGFR"]]> 400)]  <- NA_real_
+# admission.union[["PLATELETS"]][which(admission.union[["PLATELETS"]] > 600)]  <- NA_real_
+# admission.union[["K"]][which(admission.union[["K"]] > 7.5)]  <- NA_real_
+admission.union[["WBC"]][which(admission.union[["WBC"]] > 50)]  <- NA_real_
+admission.union[["GLUCOSE"]][which(admission.union[["GLUCOSE"]] > 750)]  <- NA_real_
+
+
+
+measure.list <- c("EGFR", "HGB", "N_A", "K", "PLATELETS", "WBC", "GLUCOSE")
+
+k <- 1
+for (m in measure.list){
+  output <- generate_gbtm_df_2(m, m, admission.union, num_adms = 10)
+  if (k==1){
+    combined.labs.df <- output$combined
+  } else{
+    temp.labs.df <- output$labs %>% select(-patients_id)
+    combined.labs.df <- cbind(combined.labs.df, temp.labs.df)
+  }
+  k <-  k+1
+}
+```
+
+
+```{r}
+write.xlsx(combined.labs.df, '~/Desktop/datasets/processed/GBTM_data/combined 7 labs data_v2.xlsx', col.names = TRUE, row.names = FALSE)
+```
+
+```{r}
+# combined.labs.df <- readxl:: read_excel('~/Desktop/datasets/processed/GBTM_data/combined 7 labs data_v2.xlsx')
+```
+
+
+# Add 5 attris of lab measurements
+Min, Max, Mean, Median, Std
+
+```{r}
+last_ave_labs <- function(measure_name, admission_lab, combined.labs.df){
+  
+  last.list <- c()
+  ave.list <- c()
+  min.list <- c()
+  max.list <- c()
+  std.list <- c()
+  
+  for (i in unique(combined.labs.df$patients_id)){
+    tp.data <- admission_lab[which(admission_lab$rID==i),-c(1, 2, 5, 11)][measure_name]
+    goodIdx <- !is.na(tp.data)
+    # if there's no non-NA value for this measurement/this patient
+    if (length(tp.data[goodIdx])==0){
+      last.list <- c(last.list, NA_real_)
+      ave.list <- c(ave.list, NA_real_)
+      min.list <- c(min.list, NA_real_)
+      max.list <- c(max.list, NA_real_)
+      std.list <- c(std.list, NA_real_)
+    } else if (length(tp.data[goodIdx])==1){
+      last.list <- c(last.list, tp.data[goodIdx][length(tp.data[goodIdx])])
+      ave.list <- c(ave.list, mean(tp.data[goodIdx]))
+      min.list <- c(min.list, min(tp.data[goodIdx]))
+      max.list <- c(max.list, max(tp.data[goodIdx]))
+      std.list <- c(std.list, 0)
+    } 
+    else {
+      last.list <- c(last.list, tp.data[goodIdx][length(tp.data[goodIdx])])
+      ave.list <- c(ave.list, mean(tp.data[goodIdx]))
+      min.list <- c(min.list, min(tp.data[goodIdx]))
+      max.list <- c(max.list, max(tp.data[goodIdx]))
+      std.list <- c(std.list, sd(tp.data[goodIdx]))
+    }
+  }
+  returnList <- list("last" = last.list, "average" = ave.list, "min" = min.list, 
+                     "max" = max.list, "sd" = std.list)
+  return(returnList)
+  
+}
+
+updated.admission.lab <- admission_lab
+
+
+updated.admission.lab[["EGFR"]][which(updated.admission.lab[["EGFR"]]> 300)]  <- NA_real_
+updated.admission.lab[["WBC"]][which(updated.admission.lab[["WBC"]] > 50)]  <- NA_real_
+updated.admission.lab[["GLUCOSE"]][which(updated.admission.lab[["GLUCOSE"]] > 750)]  <- NA_real_
+updated.admission.lab[["EGFR"]][which(updated.admission.lab[["EGFR"]]> 200)]  <- 200
+updated.admission.lab[["PLATELETS"]][which(updated.admission.lab[["PLATELETS"]] > 600)]  <- 600
+updated.admission.lab[["N_A"]][which(updated.admission.lab[["N_A"]] > 160)]  <- 160
+updated.admission.lab[["GLUCOSE"]][which(updated.admission.lab[["GLUCOSE"]] > 550)]  <- 550
+
+
+
+ggplot(data = updated.admission.lab, aes(GLUCOSE)) + geom_histogram()
+
+
+labs.ave.last <- combined.labs.df
+for (val in names(admission_lab)[-c(1, 2, 5, 11)]){
+  output <- last_ave_labs(val, updated.admission.lab, combined.labs.df)
+  labs.ave.last <- cbind(labs.ave.last, output$last)
+  labs.ave.last <- cbind(labs.ave.last, output$average)
+  labs.ave.last <- cbind(labs.ave.last, output$min)
+  labs.ave.last <- cbind(labs.ave.last, output$max)
+  labs.ave.last <- cbind(labs.ave.last, output$sd)
+  names(labs.ave.last)[names(labs.ave.last) == "output$last"] <-  paste(val, "last", sep="_") 
+  names(labs.ave.last)[names(labs.ave.last) == "output$average"] <- paste(val, "average", sep="_")
+  names(labs.ave.last)[names(labs.ave.last) == "output$min"] <-  paste(val, "min", sep="_") 
+  names(labs.ave.last)[names(labs.ave.last) == "output$max"] <- paste(val, "max", sep="_")
+  names(labs.ave.last)[names(labs.ave.last) == "output$sd"] <- paste(val, "sd", sep="_")
+}
+
+
+# fill the NA value in egfr with average value
+labs.ave.last$EGFR_last[is.na(labs.ave.last$EGFR_last)] <- mean(labs.ave.last$EGFR_last, na.rm = TRUE)
+labs.ave.last$EGFR_average[is.na(labs.ave.last$EGFR_average)] <- mean(labs.ave.last$EGFR_average, na.rm = TRUE)
+labs.ave.last$EGFR_min[is.na(labs.ave.last$EGFR_min)] <- mean(labs.ave.last$EGFR_min, na.rm = TRUE)
+labs.ave.last$EGFR_max[is.na(labs.ave.last$EGFR_max)] <- mean(labs.ave.last$EGFR_max, na.rm = TRUE)
+labs.ave.last$EGFR_sd[is.na(labs.ave.last$EGFR_sd)] <- mean(labs.ave.last$EGFR_sd, na.rm = TRUE)
+```
+
+```{r}
+openxlsx::write.xlsx(labs.ave.last, '~/Desktop/datasets/processed/GBTM_data/last and average labs data.xlsx', col.names = TRUE, row.names = FALSE)
+```
+
+# Add covariates and labels
+
+## Add outcome labels
+```{r}
+labs7.df <- readxl::read_excel("~/Desktop/datasets/processed/GBTM_data/combined 7 labs data.xlsx", sheet = 'Sheet 1')
+labels.df <- baseline.df %>% select("rID", "CTB", "30_day_CTB", "60_day_CTB", "90_day_CTB", "1_year_CTB")
+names(labels.df) <- c("rID", "CTB", "_30_day_CTB", "_60_day_CTB", "_90_day_CTB", "_1_year_CTB")
+labels.df <- labels.df[which(labels.df$rID %in% labs7.df$patients_id),]
+labs.label <- cbind(labs7.df, labels.df)
+```
+
+```{r}
+write.xlsx(labs.label, '~/Desktop/datasets/processed/GBTM_data/combined 7 labs_labels.xlsx', col.names = TRUE, row.names = FALSE)
+```
+
+## Add time-varying covariates
+
+POST_VAD and POST_TRANSPLANT in admission dataset  
+We would like to know their enduring effects. So, we make the all indicators = 1 after the VAD or HTx event.
+```{r}
+labs7.df.2 <- readxl::read_excel("~/Desktop/HF_Research/datasets/processed/GBTM_data/combined 7 labs_labels.xlsx", sheet = 'Sheet 1')
+```
+
+```{r generate tcov var for VAD and HTx}
+admission.subdf <- admission_30NA[which((admission_30NA$rID %in% labs7.df.2$patients_id)&(admission_30NA$admission_count<=10)),] %>% 
+  select(rID, POST_VAD, POST_TRANSPLANT, admission_count)
+
+
+for (i in unique(admission.subdf$rID)){
+  temp.df <- admission.subdf[which(admission.subdf$rID==i),]
+  if ((1 %in% temp.df$POST_VAD) & (1 %in% temp.df$POST_TRANSPLANT)) {
+    temp.df$POST_VAD[seq(which(temp.df$POST_VAD==1)[1], 
+                         which(temp.df$POST_TRANSPLANT==1)[1])-1] <- 1
+    admission.subdf[which(admission.subdf$rID==i),]$POST_VAD <- temp.df$POST_VAD
+  }else if (1 %in% temp.df$POST_VAD){
+    temp.df$POST_VAD[seq(which(temp.df$POST_VAD==1)[1],dim(temp.df)[1])] <- 1
+    admission.subdf[which(admission.subdf$rID==i),]$POST_VAD <- temp.df$POST_VAD
+  } 
+  if (1 %in% temp.df$POST_TRANSPLANT){
+    temp.df$POST_TRANSPLANT[seq(which(temp.df$POST_TRANSPLANT==1)[1],dim(temp.df)[1])] <- 1
+    admission.subdf[which(admission.subdf$rID==i),]$POST_TRANSPLANT <- temp.df$POST_TRANSPLANT
+  }
+}
+
+post.vad.df <- reshape2::dcast(admission.subdf, rID ~ admission_count,  value.var="POST_VAD", fill= NA_real_ )
+names(post.vad.df) <- c("rID", generate_col_names("POST_VAD", seq(1,10)))
+post.htx.df <- reshape2::dcast(admission.subdf, rID ~ admission_count,  value.var="POST_TRANSPLANT", fill = NA_real_)
+names(post.htx.df) <- c("rID", generate_col_names("POST_HTX", seq(1,10)))
+
+
+labs7.lab.vary <- cbind(labs7.df.2, cbind(post.vad.df[,-1], post.htx.df[-1]))
+labs7.lab.vary$rID <- NULL
+```
+
+```{r}
+write.xlsx(labs7.lab.vary, '~/Desktop/HF_Research/datasets/processed/GBTM_data/labs_labels_tvarycov.xlsx', col.names = TRUE, row.names = FALSE)
+```
+
+
+
+
+Other procedures that have > 1% positive rate: PCI, IABP, ABLATION, ICD_IMPLANT, BIV_ICD_IMPLANT
+
+```{r gen tcov var for other procedure}
+admission.subdf <- admission_30NA[which((admission_30NA$rID %in% labs7.df.2$patients_id) & (admission_30NA$admission_count<=10)),] %>% 
+  select(rID, PCI, IABP, ABLATION, ICD_IMPLANT, BIV_ICD_IMPLANT, admission_count)
+
+procedure.list <-  c("PCI", "IABP", "ABLATION", "ICD_IMPLANT", "BIV_ICD_IMPLANT")
+for (i in unique(admission.subdf$rID)){
+  temp.df <- admission.subdf[which(admission.subdf$rID==i),]
+  for (val in procedure.list){
+    if (1 %in% temp.df[val]){
+      temp.df[val][which(temp.df[val]==1)] <- 1
+      admission.subdf[which(admission.subdf$rID==i),][val] <- temp.df[val]
+    } 
+  }
+}
+procedures.df <- labs7.lab.vary
+for (val in procedure.list){
+   temp.proc.df <- reshape2::dcast(admission.subdf, rID ~ admission_count,  value.var=val, fill= NA_real_ )
+  names(temp.proc.df) <- c("rID", generate_col_names(val, seq(1,10)))
+  procedures.df <- cbind(procedures.df, temp.proc.df[,-1])
+}  
+
+```
+
+```{r}
+write.xlsx(procedures.df, '~/Desktop/datasets/processed/GBTM_data/labs_proc_cov.xlsx', col.names = TRUE, row.names = FALSE)
+```
+
+
+
+
+
+
+## Add baseline covariates
+
+```{r}
+labs7.lab.vary <- readxl::read_excel("~/Desktop/HF_Research/datasets/processed/GBTM_data/labs_labels_tvarycov.xlsx", sheet = 'Sheet 1')
+```
+
+```{r}
+baseline.attris.df <- baseline.profile.df %>% select("rID", "AGE_ADMISSION", "FEMALE", "RACE_White", starts_with("TOBACCO_"), starts_with("INSUR_"), starts_with("BP_"), "PULSE", "BMI", ends_with("_HST"), starts_with("HX_"), starts_with("PRIOR_"),  "CCI_TOTAL_SCORE", starts_with("CCI_"), ends_with("_00"), "CTB", ends_with("_CTB"))
+baseline.attris.df$TOBACCO_STATUS_LABEL <- NULL
+
+baseline.attris.df <- baseline.attris.df[which(baseline.attris.df$rID %in% labs7.lab.vary$patients_id), -1] 
+labs7.lab.vary.sta <- cbind(labs7.lab.vary, baseline.attris.df)
+
+
+write.xlsx(labs7.lab.vary.sta, '~/Desktop/HF_Research/datasets/processed/GBTM_data/labs_labels_tvarycov.xlsx', col.names = TRUE, row.names = FALSE)
+```
+
+
+# identify patients in each traj group
+
+```{r}
+df <- read_excel("~/Desktop/trial save.xlsx", sheet="Sheet1")
+groups <- sort(unique(df$`_traj_Group`))
+pat.membership <- vector(mode="list", length = length(groups))
+for (group in groups){
+  pat.membership[[group]] <- df$patients_id[which(df$`_traj_Group`==group)]
+}
+```
+
+```{r}
+# hgb.membership <- pat.membership
+# egfr.membership <- pat.membership
+# na.membership <- pat.membership
+# platelets.membership <- pat.membership
+# k.membership <- pat.membership
+# wbc.membership <- pat.membership
+```
+
+
+
+```{r}
+num_exist_check <- function(gbtm.df, membership.df, measure){
+  df <- gbtm.df %>% select( patients_id, starts_with(measure))
+  periods <- length(names(df))-1
+  exist.list <- vector(mode="list", length = length(membership.df))
+  for (i in (1:length(membership.df))){
+    sub.df <- df[which(df$patients_id %in% membership.df[[i]]),]
+    df.temp <- sub.df %>% select(starts_with(paste(measure, "_", sep=""))) %>% select(c(1:periods)) %>%  summarise_all(funs(sum(!is.na(.))))
+    exist.list[[i]] <- df.temp[1,]
+  }
+  return(exist.list)
+}
+```
+
+```{r}
+exist.l <- num_exist_check(combined.labs.df, pat.membership, "K")
+# tmp <- exist.l[1]
+# write.xlsx(tmp, '~/Desktop/temp.xlsx', col.names = TRUE, row.names = FALSE)
+exist.l
+```
+
+
+
+```{r}
+tmp <- admission_30NA[which((admission_30NA$rID %in% pat.membership[[3]]) & (admission_30NA$admission_count==1)),] %>% select(rID, admission_count, WBC)
+
+summary(tmp)
+```
+
+```{r}
+row.names(temp.tab.filtered)
+```

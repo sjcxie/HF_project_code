@@ -19,7 +19,7 @@ library(Hmisc)
 
 The dataset used is admission withou 30% NA tolerance. 
 ```{r}
-admission_30NA <- read_excel("~/Desktop/datasets/processed/Filtered Attributes Admission v2.xlsx", sheet = 'NA30_filtered_admission')
+admission_30NA <- read_excel("~/Desktop/datasets/processed/Filtered Attributes Admission v2.xlsx", sheet = 'Sheet 1')
 baseline.df <- read_excel('~/Desktop/datasets/processed/Filtered Baseline imputed.xlsx', sheet = 'Sheet 1')
 ```
 
@@ -111,7 +111,7 @@ admission_lab <- admission.hgb
 ```{r}
 measure = "EGFR"
 admission.egfr <- admission_lab
-# summary(admission_lab[[measure]])
+summary(admission_lab[[measure]])
 # ggplot(data = admission.egfr, aes(EGFR)) + geom_histogram()
 dim(admission_lab[which(admission_lab$EGFR > 200),])
 admission.egfr[[measure]][which(admission_lab[[measure]]> 200)]  <- NA_real_
@@ -122,6 +122,9 @@ admission.egfr[[measure]][which(admission_lab[[measure]]> 200)]  <- NA_real_
 admission_lab <- admission.egfr
 ```
 
+```{r}
+View(admission_lab[which(admission_lab$EGFR<30),])
+```
 
 
 
@@ -159,13 +162,13 @@ admission_lab <- admission.na
 ```{r}
 measure = "GLUCOSE"
 admission.glucose <- admission_lab
-# summary(admission_lab[[measure]])
-# ggplot(data = admission.glucose, aes(GLUCOSE)) + geom_histogram()
+summary(admission_lab[[measure]])
+ggplot(data = admission.glucose, aes(GLUCOSE)) + geom_histogram()
 ```
 
 ```{r}
-dim(admission_lab[which(admission_lab$GLUCOSE > 750),])
-admission.glucose[[measure]][which(admission_lab[[measure]]> 750)]  <- NA_real_
+dim(admission_lab[which(admission_lab$GLUCOSE > 500),])
+admission.glucose[[measure]][which(admission_lab[[measure]]> 500)]  <- NA_real_
 ```
 
 

@@ -1,0 +1,109 @@
+---
+title: "R Notebook"
+output: html_notebook
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+library(readxl)
+library(tidyverse)
+library(kml)
+library(kml3d)
+library(knitr)
+```
+
+
+```{r}
+full.baseline <- readxl::read_excel("/Users/jinchenxie/Desktop/HF_Research/datasets/processed/All Baseline Attributes combined.xlsx", sheet = 'Sheet 1')
+labs <- readxl::read_excel("/Users/jinchenxie/Desktop/HF_Research/datasets/processed/GBTM_data/labs_labels_tvarycov.xlsx")
+gbtm.results.6.df <- readxl::read_excel("/Users/jinchenxie/Desktop/HF_Research/Weekly Progress/week 18/traj_results/multi_nofac_notcov.xlsx")
+```
+
+
+
+
+
+```{r}
+egfr.labs <- labs %>% select(patients_id, starts_with('EGFR_'))
+egfr.labs.df <- data.frame(egfr.labs)
+egfr.cld <- clusterLongData(egfr.labs.df, varNames='EGFR', maxNA=9)
+exp1 <- kml(egfr.cld, nbClusters = 5, 10, toPlot='criterion')
+```
+
+```{r}
+egfr.cld.2 <- clusterLongData(egfr.labs.df, varNames='EGFR', maxNA=9)
+option1 <- parALGO(saveFreq=10, imputationMethod = "copyMean")
+kml(egfr.cld.2, nbClusters = 5, 10, toPlot='both', parAlgo = option1)
+```
+
+
+# KmL3d
+
+```{r}
+six.labs <- labs %>% select(patients_id, starts_with('EGFR_'), starts_with('HGB_'), starts_with('N_A_'),
+                            starts_with('K_'), starts_with('PLATELETS_'), starts_with('WBC_'))
+# six.labs[,12:21]
+six.labs.df <- data.frame(six.labs)
+labs.cld <- clusterLongData3d(traj=six.labs.df, timeInData=list(WBC=52:61, EGFR=2:11, HGB=12:21, N_A=22:31, K=32:41, Platelets=42:51), maxNA = 20, time=1:10, varNames = c("WBC", "EGFR", "HGB", "NA", "K", "Platelets"))
+
+option1 <- parKml3d(saveFreq=10, imputationMethod = "copyMean")
+
+kml3d(labs.cld, nbClusters = 5, 60, toPlot='none', parAlgo = option1)
+
+cluster.5 <- labs.cld['c5'][[2]]['clusters']
+
+```
+
+Change CluterLongData to LongData class
+```{r}
+labs.ld <- longData3d(traj=six.labs.df, timeInData=list(WBC=52:61, EGFR=2:11, HGB=12:21, N_A=22:31, K=32:41, Platelets=42:51), maxNA = 20, time=1:10, varNames = c("WBC", "EGFR", "HGB", "NA", "K", "Platelets"))
+part <- partition(cluster.5)
+lab <- 'Platelets'
+plotTrajMeans(longDataFrom3d(labs.ld, variable=lab), part, xlab='Time', ylab=lab, parTraj=parTRAJ(type="n"), ylim=c(150, 300))
+
+# plotTrajMeans(longDataFrom3d(labs.ld,variable="Platelets"), part, xlab='Time', ylab='Platelets', parMean=parMEAN(type='l'), parTraj=parTRAJ(col ="clusters"), ylim=c(120, 300))
+```
+
+```{r}
+kmeans.df <- data.frame(id=labs.cld@idFewNA, group=cluster.5)
+write_xlsx(kmeans.df,"/Users/jinchenxie/Desktop/HF_Research/Weekly Progress/week 25/multi_kml3d_groups.xlsx")
+```
+
+
+
+
+# Cluter membership overlaps
+## 6 labs - kMmeans
+There 6 ids have more than 30 missing values: 
+```{r}
+id.diff <- setdiff(labs.cld@idAll, labs.cld@idFewNA)
+gbtm.results.6.df <- gbtm.results.6.df[!(gbtm.results.6.df$patients_id %in% id.diff),]
+```
+
+
+```{r}
+gbtm.results.6 <- gbtm.results.6.df$`_traj_Group`
+gbtm.results.6[gbtm.results.6==1] <- 'D'
+gbtm.results.6[gbtm.results.6==2] <- 'E'
+gbtm.results.6[gbtm.results.6==3] <- 'C'
+gbtm.results.6[gbtm.results.6==4] <- 'A'
+gbtm.results.6[gbtm.results.6==5] <- 'B'
+```
+
+```{r}
+gbtm.results.6 <- gbtm.results.6.df$`_traj_Group`
+gbtm.results.6[gbtm.results.6==1] <- 'D'
+gbtm.results.6[gbtm.results.6==2] <- 'E'
+gbtm.results.6[gbtm.results.6==3] <- 'B'
+gbtm.results.6[gbtm.results.6==4] <- 'A'
+gbtm.results.6[gbtm.results.6==5] <- 'C'
+```
+
+
+```{r}
+traj.compare.df <- data.frame(id=gbtm.results.6.df$patients_id, kmeans=cluster.5, gbtm=gbtm.results.6)
+dim(traj.compare.df[which((traj.compare.df$kmeans=='C') &(traj.compare.df$gbtm=='C')),])
+
+```
+

@@ -1,0 +1,46 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(echo=FALSE, warning=FALSE, message=FALSE)
+library(tidyverse)
+library(knitr)
+library(data.table)  #for transpose() function
+library(reshape2)
+library(openxlsx)
+# library(Hmisc)
+
+cbPalette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+```
+
+# Import Data
+```{r}
+# multitraj.results <- readxl::read_excel("/Users/jinchenxie/Desktop/HF_Research/Weekly Progress/week 18/traj_results/multi_no_tcov.xlsx")
+egfr.results <- readxl::read_excel("/Users/jinchenxie/Desktop/HF_Research/Weekly Progress/week 18/traj_results/egfr_single.xlsx")
+group.results <- egfr.results %>% select(patients_id, starts_with("_traj_Group"))
+names(group.results)[names(group.results) == "_traj_Group"] <- "_traj_Group_T10"
+group.results <- group.results %>% select(-"_traj_Group_T10", "_traj_Group_T10")
+```
+
+```{r}
+traj.members <- group.results %>% group_by(`_traj_Group_T1`) %>% tally()
+i <- 2
+for (val in names(group.results)[c(3:length(names(group.results)))]){
+  
+  temp <- group.results %>% group_by(.dots=as.name(val)) %>% tally()
+  names(temp) <- c(paste('_traj_Group',i, sep='_'), paste('n',i,sep=''))
+  traj.members <- cbind(traj.members, temp)
+  i <-  i+1
+}
+
+traj.members <- traj.members %>% select(starts_with("n"))
+traj.members.t <- as.data.frame(t(traj.members))
+ggplot(data = traj.members.t, aes(x=seq(1,10,1))) + geom_line(aes(y=V1, colour='Group1')) + geom_line(aes(y=V2, colour='Group2')) + geom_line(aes(y=V3, colour="Group3")) + geom_line(aes(y=V4, colour="Group4")) + geom_line(aes(y=V5, colour="Group5")) + scale_y_continuous(name ="Number of patients in each traj group") + scale_x_continuous(name = "Admission Number", breaks=seq(1, 10, 1))
+
+
+ggsave("/Users/jinchenxie/Desktop/HF_Research/Weekly Progress/week 20/egfr traj membership plot.png", width = 7, height = 4)
+```
+
+
+How many

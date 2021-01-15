@@ -4,54 +4,55 @@ output: html_notebook
 ---
 ```{r global_options, include=FALSE}
 knitr::opts_chunk$set(echo=FALSE, warning=FALSE, message=FALSE)
-library(readxl)
 library(tidyverse)
-library(dplyr)
 ```
 
+# Import data
 
-# import data
 ```{r}
-baseline.df <- read_excel("/Users/jinchenxie/Desktop/datasets/processed/GBTM_data/gbtm Cohort data combined.xlsx", sheet = 'baseline')
-admission.df <- read_excel("/Users/jinchenxie/Desktop/datasets/processed/GBTM_data/gbtm Cohort data combined.xlsx", sheet = "admission")
-
-
-# baseline.df <- read_excel('~/Desktop/datasets/processed/GBTM_data/Filtered Baseline imputed.xlsx', sheet = 'Sheet 1')
-# admission.df <- read_excel("~/Desktop/datasets/processed/Filtered Attributes Admission.xlsx", sheet = 'NA30_filtered_admission')
 # static.features <- read_excel("~/Desktop/datasets/processed/Static Characteristics.xlsx", sheet = 'static')
+# baseline.df <- read_excel('~/Desktop/datasets/processed/Filtered Baseline imputed.xlsx', sheet = 'Sheet 1')
+# admission.df <- read_excel("/Users/jinchenxie/Desktop/datasets/processed/Filtered Attributes Admission v2.xlsx", sheet = 'Sheet 1')
+
+full.baseline <- readxl::read_excel("/Users/jinchenxie/Desktop/HF_Research/datasets/processed/All Baseline Attributes combined.xlsx", sheet = 'Sheet 1')
+```
+
+**patient 9597 has POST_VAD ==1 in baseline. We modified admission to match baseline record.**
+```{r}
+# admission.df[which((admission.df$rID == 9597)&(admission.df$last_adm==1)),]$POST_VAD <- 1
+# write.xlsx(admission.df, "/Users/jinchenxie/Desktop/datasets/processed/Filtered Attributes Admission v2.xlsx", col.names = TRUE, row.names = FALSE)
+```
+
+# Generate attributes based on procedures ever
+```{r}
+# procedure.ever <- admission.df %>% select(-ends_with("_DAYS")) %>% select(rID, CABG:STVR, ends_with("FLAG"), PCI:CRT_IMPLANT)
+# procedure.ever <- procedure.ever %>% group_by(rID) %>% summarise_each(list(ever = max))
+```
+
+# Save the FULL cohort ALL attributes baseline 
+```{r}
+# static.features <- static.features %>% select(-FEMALE, -starts_with("HX_"), -ends_with("_HST"), -starts_with("CCI_"), -ends_with("_CARDIOMYOPATHY"))
+# names(static.features)[names(static.features) == "AGE_ADMISSION"] <- "Normalized_Age"
+# full.baseline <- cbind(baseline.df, static.features[,-c(1)], procedure.ever[,-c(1)])
+# write.xlsx(full.baseline, '~/Desktop/datasets/processed/All Baseline Attributes combined.xlsx', col.names = TRUE, row.names = FALSE)
 ```
 
 
-# Add attributes based on procedures ever
+
+
+
+
+
+
+# Profiling traj groups 
+## identify patients in each traj group
 ```{r}
-admission.relevant <- admission.df %>% select(-ends_with("_DAYS")) %>% select(rID, CABG:STVR, ends_with("FLAG"), PCI:CRT_IMPLANT)
+# df <- readxl::read_excel("~/Desktop/trial save.xlsx", sheet="Sheet1")
+df <- readxl::read_excel("/Users/jinchenxie/Desktop/HF_Research/Weekly Progress/week 18/egfr_single.xlsx")
 
-admission.relevant <- admission.relevant %>% group_by(rID) %>% summarise_each(list(ever = max))
-adm.attris <- names(admission.relevant)[-1]
-```
+rid <- df$patients_id
+baseline.sub <- full.baseline[which(full.baseline$rID %in% rid),]
 
-
-
-```{r}
-df <- read_excel("~/Desktop/trial save.xlsx", sheet="Sheet1")
-```
-
-
-# Prepare the attributes dataframe
-```{r}
-# select features 
-attris.df <- baseline.df %>% select("rID", "AGE_ADMISSION", "FEMALE", "RACE_White", starts_with("TOBACCO_"), starts_with("INSUR_"), starts_with("BP_"), "PULSE", "BMI", ends_with("_HST"), starts_with("HX_"), starts_with("PRIOR_"),  "CCI_TOTAL_SCORE", starts_with("CCI_"), starts_with("POST_"), ends_with("_CARDIOMYOPATHY"), ends_with("_00"), "CTB", ends_with("_CTB"), total_adms, Corrected_Followup_Days)
-attris.df$TOBACCO_STATUS_LABEL <- NULL   # we don't want the altered CCI_TOTAL_SCORE from static dataframe
-
-
-attris.df <- cbind(attris.df, admission.relevant[,-1])
-# names(attris.df)
-```
-
-
-
-# identify patients in each traj group
-```{r}
 groups <- sort(unique(df$`_traj_Group`))
 pat.membership <- vector(mode="list", length = length(groups))
 for (group in groups){
@@ -60,34 +61,38 @@ for (group in groups){
 ```
 
 
-
-# demographic features
-AGE_ADMISSION, RACE, GENDER, TOBACCO_STATUS, INSURANCE_PAYER
+## Prepare the attributes dataframe
 ```{r}
-# summary(static.features$RACE_White)
-numeric.list <- c("n","%n","AGE_ADMISSION", "std(AGE)",  "CCI_TOTAL_SCORE", "std(CCI_SCORE)", "BP_SYSTOLIC", "std(BP_SYSTOLIC)", "BP_DIASTOLIC", "std(BP_DIASTOLIC)", "PULSE", "std(PULSE)","BMI", "std(BMI)", "total_adms", "std(total_adms)", "Corrected_Followup_Days", "std(Corrected_Followup_Days)")
+# select features 
+attris.df <- baseline.sub %>% select("rID", "AGE_ADMISSION", "FEMALE", "RACE_White", starts_with("TOBACCO_"), starts_with("INSUR_"), starts_with("BP_"), "PULSE", "BMI",  "RV_FUNC", "AR", "MR","PR", "TR", ends_with("_HST"), starts_with("HX_"), starts_with("PRIOR_"),  "CCI_TOTAL_SCORE", starts_with("CCI_"), starts_with("POST_"), ends_with("_CARDIOMYOPATHY"), ends_with("_00"), "CTB", ends_with("_CTB"), total_adms, Corrected_Followup_Days)
+attris.df$TOBACCO_STATUS_LABEL <- NULL   # we don't want the altered CCI_TOTAL_SCORE from static dataframe
 
-nu.list <- c("AGE_ADMISSION", "CCI_TOTAL_SCORE", "BP_SYSTOLIC", "BP_DIASTOLIC", "PULSE", "BMI",  "total_adms", "Corrected_Followup_Days")
+numeric.list <- c("n","%n","AGE_ADMISSION", "std(AGE)",  "CCI_TOTAL_SCORE", "std(CCI_SCORE)", "BP_SYSTOLIC", "std(BP_SYSTOLIC)", "BP_DIASTOLIC", "std(BP_DIASTOLIC)", "PULSE", "std(PULSE)","BMI", "std(BMI)", "RV_FUNC", "std(RV_FUNC)", "AR", "std(AR)", "MR", "std(MR)", "PR", "std(PR)", "TR", "std(TR)","total_adms", "std(total_adms)", "Corrected_Followup_Days", "std(Corrected_Followup_Days)")
+
+nu.list <- c("AGE_ADMISSION", "CCI_TOTAL_SCORE", "BP_SYSTOLIC", "BP_DIASTOLIC", "PULSE", "BMI", "RV_FUNC", "AR", "MR","PR", "TR", "total_adms", "Corrected_Followup_Days")
 
 binary.list <- colnames(attris.df)[-1]
 binary.list <- binary.list[!binary.list %in% nu.list]
 attributes.list <- c(numeric.list, binary.list)
+list.attris <- c(nu.list, binary.list)
+```
 
-
+```{r}
 profile.df <- data.frame(row.names = groups)
 
 
 for (group in groups){
   k <- 1
   profile.df[group, 1] <- length(pat.membership[[group]])
-  profile.df[group, 2] <- length(pat.membership[[group]])/dim(baseline.df)[1]
+  profile.df[group, 2] <- length(pat.membership[[group]])/dim(df)[1]
+  
   k <- k+2
   for (val in nu.list){
     profile.df[group, k] <- mean(attris.df[[val]][which(attris.df$rID %in% pat.membership[[group]])], na.rm = TRUE)
     profile.df[group, k+1] <- sd(attris.df[[val]][which(attris.df$rID %in% pat.membership[[group]])], na.rm = TRUE)
     k <- k+2
   }
-  k <- 19
+  k <- 29
   for (attri in binary.list){
     # print(attri)
     profile.df[group, k] <- sum(attris.df[[attri]][which(attris.df$rID %in% pat.membership[[group]])], na.rm = TRUE)/length(pat.membership[[group]])
@@ -102,14 +107,16 @@ rm(k, val)
 ```
 
 
+# select significant attris only
+```{r}
+sub.profile.df <- profile.df %>% select(groups, n, `%n`, all_of(sig.list))
+```
+
+
 # save dataset
 ```{r}
-write.xlsx(profile.df, '~/Desktop/traj profile.xlsx', col.names = TRUE, row.names = FALSE)
+write.xlsx(sub.profile.df, '~/Desktop/traj profile.xlsx', col.names = TRUE, row.names = FALSE)
 # write.xlsx(update.baseline.df, '~/Desktop/datasets/processed/Filtered Attributes Baseline.xlsx', col.names = TRUE, row.names = FALSE)
 ```
 
-list of attributes for creating 'combined gbtm data v3.xlsx'
-```{r}
-list.attris <- c(nu.list, binary.list)
-```
 

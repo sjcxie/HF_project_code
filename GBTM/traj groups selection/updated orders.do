@@ -68,3 +68,15 @@ traj, var(PLATELETS_*) indep(T_*) model(cnorm) min(10) max(750) order(0 0 2 2)
 traj, var(PLATELETS_*) indep(T_*) model(cnorm) min(10) max(750) order(0 1 0)
 
 trajplot, xtitle(Time) ytitle(Platelets) ylabel(150(100)450) ci
+
+
+
+
+traj, var(EGFR_*) indep(T_*) model(cnorm) min(1) max(200) order(2 3 2 1 0)
+traj, var(N_A_*) indep(T_*) model(cnorm) min(100) max(175) order(2 2 1 2 3)
+traj, var(GLUCOSE_*) indep(T_*) model(cnorm) min(1) max(500) order(3 0 3 3 2)
+traj, var(GLUCOSE_*) indep(T_*) model(cnorm) min(1) max(500) order(2 0 3 3 0)
+trajplot, xtitle(Time) xlabel(0(1)10) ylabel(100(50)350) ci
+
+traj, var(K_*) indep(T_*) model(cnorm) min(1.5) max(8) order(0 1 0 0 2)
+traj, var(WBC_*) indep(T_*) model(cnorm) min(0) max(50) order(3 0 2 3 3)

@@ -1,0 +1,237 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+library(VennDiagram)
+library(RColorBrewer)
+```
+
+
+
+# EGFR single traj 
+
+```{r}
+egfr.no.tcov <- readxl::read_excel("/Users/jinchenxie/Desktop/HF_Research/Weekly Progress/week 18/traj_results/egfr_single.xlsx")
+```
+
+In EGFR single trajectory, Group 1 is the highest risk group.
+In Multi-traj, Group 2 is the highest risk group.
+We would like to examine how many patients are in the highest risk group for both of them.
+```{r}
+multi.risky <- multitraj.no.tcov[which(multitraj.no.tcov$`_traj_Group`==2),]
+egfr.risky <- egfr.no.tcov[which(egfr.no.tcov$`_traj_Group`==1),]
+
+risky1 <- multi.risky[which(multi.risky$patients_id %in% egfr.risky$patients_id),]
+dim(risky1)[1]/dim(multi.risky)[1]
+```
+
+There are 259 patients in the highest risk group in multi-traj who are also in the highest risk group for single egfr traj.
+
+```{r}
+egfr.single.outcomes<- readxl::read_excel("/Users/jinchenxie/Desktop/HF_Research/Weekly Progress/week 18/egfr_single_withoutcome.xlsx")
+```
+
+```{r}
+
+egfr.single.outcomes$CTB_predicted <- 0
+egfr.single.outcomes[which(egfr.single.outcomes$`_traj_Outcome`>0.5),]$CTB_predicted <- 1
+summary(egfr.single.outcomes$CTB_predicted)
+
+
+dim(egfr.single.outcomes[which(egfr.single.outcomes$GC == egfr.single.outcomes$CTB_predicted),])[1]/1653
+```
+
+# Multi-traj model result
+
+```{r}
+cohort.ids <- readxl::read_excel("/Users/jinchenxie/Desktop/HF_Research/datasets/subset1653.xlsx")
+# multitraj.no.tcov <- readxl::read_excel("/Users/jinchenxie/Desktop/HF_Research/Weekly Progress/week 18/traj_results/multi_no_tcov.xlsx")
+multi.full <- readxl::read_excel("/Users/jinchenxie/Desktop/HF_Research/Weekly Progress/week 18/traj_results/multi_full.xlsx")
+```
+## VAD
+`group.1` is the dataframe that contains all GBTM results of Group 1.
+`vad.ids` is the patient ids of patient who got VAD intervention.
+`no.vad.ids` is the patient ids of patient who didn't get VAD intervention.
+
+```{r}
+group.1 <- multi.full[which(multi.full$`_traj_Group` == 5),]
+# group.1 <- multi.full
+ids <- group.1$patients_id
+group.1.vad <- group.1 %>% select(patients_id, starts_with("POST_VAD"))
+
+group.1.vad$POST_VAD <- group.1.vad %>% select(starts_with("POST_VAD")) %>% rowSums(na.rm=TRUE)
+group.1.vad[which(group.1.vad$POST_VAD > 0),]$POST_VAD <- 1
+```
+
+```{r}
+vad.ids <- group.1.vad[which(group.1.vad$POST_VAD > 0),]$patients_id
+no.vad.ids <- group.1.vad[which(group.1.vad$POST_VAD == 0),]$patients_id
+
+length(vad.ids)
+length(no.vad.ids)
+
+no.vad.ave <- group.1[which(group.1$patients_id %in% no.vad.ids),] %>% 
+    select(starts_with('EGFR_')) %>% colMeans(na.rm=TRUE) %>% as.data.frame()
+no.vad.ave$type <- "no vad"
+no.vad.ave$adm <- 1:10
+# vad.df <- no.vad.ave
+# colnames(vad.df) <- 
+vad.ave <- group.1[which(group.1$patients_id %in% vad.ids),] %>% 
+    select(starts_with('EGFR_')) %>% colMeans(na.rm=TRUE) %>% as.data.frame()
+vad.ave$type <- "with vad"
+vad.ave$adm <- 1:10
+vad.total.ave <- group.1[which((group.1$patients_id %in% vad.ids) | (group.1$patients_id %in% no.vad.ids)),] %>% 
+    select(starts_with('EGFR_')) %>% colMeans(na.rm=TRUE) %>% as.data.frame()
+vad.total.ave$type <- "total"
+vad.total.ave$adm <- 1:10
+
+
+```
+
+```{r}
+df.plot <- rbind(no.vad.ave, vad.ave, vad.total.ave)
+colnames(df.plot) <- c("val", "type", "adm")
+ggplot(df.plot, aes(x=adm, y=val, color=type)) + geom_line() + scale_color_discrete(name = "Groups") + 
+  scale_x_continuous(breaks=1:10) + ylab("Average EGFR Level")
+ggsave("/Users/jinchenxie/Desktop/HF_Research/Weekly Progress/week 20/tcov_g5_vad_egfr_plot.png", width = 7, height = 4)
+```
+
+
+## HTX
+
+```{r}
+group.1 <- multi.full[which(multi.full$`_traj_Group` == 5),]
+ids <- group.1$patients_id
+group.1.htx <- group.1 %>% select(patients_id, starts_with("POST_HTX"))
+
+group.1.htx$POST_HTX <- group.1.htx %>% select(starts_with("POST_HTX")) %>% rowSums(na.rm=TRUE)
+group.1.htx[which(group.1.htx$POST_HTX > 0),]$POST_HTX <- 1
+```
+
+```{r}
+
+htx.ids <- group.1.htx[which(group.1.htx$POST_HTX > 0),]$patients_id
+no.htx.ids <- group.1.htx[which(group.1.htx$POST_HTX == 0),]$patients_id
+
+length(htx.ids)
+length(no.htx.ids)
+
+no.htx.ave <- group.1[which(group.1$patients_id %in% no.htx.ids),] %>% 
+    select(starts_with('EGFR_')) %>% colMeans(na.rm=TRUE) %>% as.data.frame()
+no.htx.ave$type <- "no htx"
+no.htx.ave$adm <- 1:10
+# htx.df <- no.htx.ave
+# colnames(htx.df) <- 
+htx.ave <- group.1[which(group.1$patients_id %in% htx.ids),] %>% 
+    select(starts_with('EGFR_')) %>% colMeans(na.rm=TRUE) %>% as.data.frame()
+htx.ave$type <- "with htx"
+htx.ave$adm <- 1:10
+htx.total.ave <- group.1[which((group.1$patients_id %in% htx.ids) | (group.1$patients_id %in% no.htx.ids)),] %>% 
+    select(starts_with('EGFR_')) %>% colMeans(na.rm=TRUE) %>% as.data.frame()
+htx.total.ave$type <- "total"
+htx.total.ave$adm <- 1:10
+
+df.plot <- rbind(no.htx.ave, htx.ave, htx.total.ave)
+colnames(df.plot) <- c("val", "type", "adm")
+ggplot(df.plot, aes(x=adm, y=val, color=type)) + geom_line() + scale_color_discrete(name = "Groups") + 
+  scale_x_continuous(breaks=1:10) + ylab("Average EGFR Level")
+# ggsave("/Users/jinchenxie/Desktop/HF_Research/Weekly Progress/week 20/tcov_g5_htx_egfr_plot.png", width = 7, height = 4)
+```
+
+
+## Either Interventions
+```{r}
+group.1 <- multi.full[which(multi.full$`_traj_Group` == 5),]
+ids <- group.1$patients_id
+group.1.inter <- group.1 %>% select(patients_id, starts_with("POST_HTX"), starts_with("POST_VAD"))
+
+group.1.inter$POST_HTX <- group.1.inter %>% select(starts_with("POST_HTX")) %>% rowSums(na.rm=TRUE)
+group.1.inter$POST_VAD <- group.1.inter %>% select(starts_with("POST_VAD")) %>% rowSums(na.rm=TRUE)
+group.1.inter$POST_INTER <- 0
+group.1.inter[which(group.1.inter$POST_HTX > 0),]$POST_INTER <- 1
+group.1.inter[which(group.1.inter$POST_VAD > 0),]$POST_INTER <- 1
+```
+
+```{r}
+inter.ids <- group.1.inter[which((group.1.inter$POST_HTX > 0)|(group.1.inter$POST_VAD > 0)),]$patients_id
+no.inter.ids <- group.1.inter[which((group.1.inter$POST_HTX == 0)&(group.1.inter$POST_VAD == 0)),]$patients_id
+
+length(inter.ids)
+length(no.inter.ids)
+
+no.inter.ave <- group.1[which(group.1$patients_id %in% no.inter.ids),] %>% 
+    select(starts_with('EGFR_')) %>% colMeans(na.rm=TRUE) %>% as.data.frame()
+no.inter.ave$type <- "no intervention"
+no.inter.ave$adm <- 1:10
+# htx.df <- no.htx.ave
+# colnames(htx.df) <- 
+inter.ave <- group.1[which(group.1$patients_id %in% inter.ids),] %>% 
+    select(starts_with('EGFR_')) %>% colMeans(na.rm=TRUE) %>% as.data.frame()
+inter.ave$type <- "with intervention"
+inter.ave$adm <- 1:10
+
+inter.total.ave <- group.1[which((group.1$patients_id %in% inter.ids) | (group.1$patients_id %in% no.inter.ids)),] %>% 
+    select(starts_with('EGFR_')) %>% colMeans(na.rm=TRUE) %>% as.data.frame()
+inter.total.ave$type <- "total"
+inter.total.ave$adm <- 1:10
+```
+
+```{r}
+df.plot <- rbind(no.inter.ave, inter.ave, inter.total.ave)
+colnames(df.plot) <- c("val", "type", "adm")
+ggplot(df.plot, aes(x=adm, y=val, color=type)) + geom_line() + scale_color_discrete(name = "Groups") + 
+  scale_x_continuous(breaks=1:10) + ylab("Average EGFR Level")
+ggsave("/Users/jinchenxie/Desktop/HF_Research/Weekly Progress/week 20/tcov_g5_inter_egfr_plot.png", width = 7, height = 4)
+```
+# Comparisons between EGFR single and multi-traj analysis
+
+```{r}
+multitraj.no.tcov <- readxl::read_excel("/Users/jinchenxie/Desktop/HF_Research/Weekly Progress/week 18/traj_results/multi_no_tcov.xlsx")
+egfr.no.tcov <- readxl::read_excel("/Users/jinchenxie/Desktop/HF_Research/Weekly Progress/week 18/traj_results/egfr_single.xlsx")
+```
+
+
+```{r}
+high.1.egfr <- egfr.no.tcov[which(egfr.no.tcov$`_traj_Group`==1),]$patients_id
+high.2.egfr <- egfr.no.tcov[which(egfr.no.tcov$`_traj_Group`==2),]$patients_id
+high.3.egfr <- egfr.no.tcov[which(egfr.no.tcov$`_traj_Group`==5),]$patients_id
+high.4.egfr <- egfr.no.tcov[which(egfr.no.tcov$`_traj_Group`==3),]$patients_id
+high.5.egfr <- egfr.no.tcov[which(egfr.no.tcov$`_traj_Group`==4),]$patients_id
+high.1.multi <- multitraj.no.tcov[which(multitraj.no.tcov$`_traj_Group`==2),]$patients_id
+high.2.multi <- multitraj.no.tcov[which(multitraj.no.tcov$`_traj_Group`==1),]$patients_id
+high.3.multi <- multitraj.no.tcov[which(multitraj.no.tcov$`_traj_Group`==5),]$patients_id
+high.4.multi <- multitraj.no.tcov[which(multitraj.no.tcov$`_traj_Group`==3),]$patients_id
+high.5.multi <- multitraj.no.tcov[which(multitraj.no.tcov$`_traj_Group`==4),]$patients_id
+```
+
+```{r}
+myCol <- brewer.pal(2, "Pastel2")
+# for highest risk group
+graph1 <- venn.diagram(
+  list(high.5.egfr, high.5.multi),
+  category.names = c("EGFR single" , "Multi-trajectory"),
+  # filename = 'high5_venn_diagramm.png',
+  filename = '/Users/jinchenxie/Desktop/HF_Research/Weekly Progress/week 20/high5_venn_diagramm.png',
+  output = FALSE,
+   # Output features
+  imagetype="png",
+  height = 480, 
+  width = 580, 
+  resolution = 300,
+  # compression = "lzw",
+  
+  # Circles
+  lwd = 2,
+  lty = 'blank',
+  fill = myCol[1:2],
+  cex = .6,
+  cat.cex = 0.6,
+  cat.just = list(c(0.8, 0) , c(0.2, 0))
+)
+graph1
+```
+
+

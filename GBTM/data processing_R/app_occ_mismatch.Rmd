@@ -21,10 +21,7 @@ df <- read_excel("~/Desktop/trial save.xlsx", sheet="Sheet1")
 # extract BIC
 ```{r}
 bic <- df$bic[1]
-```
 
-
-```{r}
 groups <- sort(unique(df$`_traj_Group`))
 # create dataframe for storage
 prob_df <- data.frame("avePP"=numeric(length(groups)),
@@ -60,8 +57,11 @@ for (group in groups){
 prob_df <- t(prob_df)
 prob_df.2 <- t(prob_df.2)
 prob_df <- cbind(bic, prob_df, prob_df.2)
-```
 
+prob_df <- as.data.frame(prob_df)
+names(prob_df) <- c("BIC", rep("AvePP", length(groups)), rep("Real%", 5))
+row.names(prob_df) <- NULL
+```
 
 ```{r}
 write.xlsx(prob_df, '~/Desktop/app_occ.xlsx', col.names = TRUE, row.names = FALSE)
@@ -70,27 +70,25 @@ write.xlsx(prob_df, '~/Desktop/app_occ.xlsx', col.names = TRUE, row.names = FALS
 
 ```{r}
 traj.na.1 <- c()
-traj.na.2 <- c()
-traj.na.3 <- c()
-traj.na.13 <- c()
-traj.na.14 <- c()
-traj.na.15 <- c()
+traj.na.5 <- c()
+traj.na.8 <- c()
+traj.na.9 <- c()
+traj.na.10 <- c()
 mem <- vector("list", length = length(unique(df$`_traj_Group`)))
 for (group in groups){
-  mem[[group]] <- df$patientsid[which(df$`_traj_Group`== group)]
+  mem[[group]] <- df$patients_id[which(df$`_traj_Group`== group)]
 
-  group.lab <- combined.labs.time[which(combined.labs.time$patients.id %in% mem[[group]]),] 
-  traj.na.1 <- c(traj.na.1, dim(group.lab[which(is.na(group.lab$EGFR_1)),])[1]/length(mem[[group]]))
-  traj.na.2 <- c(traj.na.2, dim(group.lab[which(is.na(group.lab$EGFR_2)),])[1]/length(mem[[group]]))
-  traj.na.3 <- c(traj.na.3, dim(group.lab[which(is.na(group.lab$EGFR_3)),])[1]/length(mem[[group]]))
-  traj.na.13 <- c(traj.na.13, dim(group.lab[which(is.na(group.lab$EGFR_13)),])[1]/length(mem[[group]]))
-  traj.na.14 <- c(traj.na.14, dim(group.lab[which(is.na(group.lab$EGFR_14)),])[1]/length(mem[[group]]))
-  traj.na.15 <- c(traj.na.15, dim(group.lab[which(is.na(group.lab$EGFR_15)),])[1]/length(mem[[group]]))
+  group.lab <- combined.labs.df[which(combined.labs.df$patients.id %in% mem[[group]]),]
+  traj.na.1 <- c(traj.na.1, dim(group.lab[which(is.na(group.lab$HGB_1)),])[1]/length(mem[[group]]))
+  traj.na.2 <- c(traj.na.5, dim(group.lab[which(is.na(group.lab$EGFR_2)),])[1]/length(mem[[group]]))
+  traj.na.3 <- c(traj.na.8, dim(group.lab[which(is.na(group.lab$EGFR_3)),])[1]/length(mem[[group]]))
+  traj.na.13 <- c(traj.na.9, dim(group.lab[which(is.na(group.lab$EGFR_13)),])[1]/length(mem[[group]]))
+  traj.na.14 <- c(traj.na.10, dim(group.lab[which(is.na(group.lab$EGFR_14)),])[1]/length(mem[[group]]))
 }
-cat(traj.na.1,"\n\n", traj.na.2, 
-    "\n\n", traj.na.3, 
-    "\n\n", traj.na.13, 
-    "\n\n", traj.na.14, 
+cat(traj.na.1,"\n\n", traj.na.2,
+    "\n\n", traj.na.3,
+    "\n\n", traj.na.13,
+    "\n\n", traj.na.14,
     "\n\n", traj.na.15)
 ```
 

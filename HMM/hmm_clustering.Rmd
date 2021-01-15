@@ -1,0 +1,144 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+
+```{r}
+library(depmixS4)
+library(cluster)
+library(factoextra)
+library(tidyverse)
+```
+
+
+
+
+```{r}
+lab.temp <- labs %>% select(starts_with('PLATELETS_'))
+lab.vector <- as.vector(t(lab.temp))
+# labs.df <- data.frame(EGFR = lab.vector)
+labs.df <- cbind(labs.df, PLATELETS=lab.vector)
+```
+
+# Impute labs for forward-backward computation
+```{r}
+egfr.labs <- labs %>% select(starts_with('EGFR_'))
+imp.egfr <- longitudinalData::imputation(as.matrix(egfr.labs), method='linearInterpol.locf')
+imp.egfr <- imp.egfr[complete.cases(imp.egfr), ]
+```
+
+```{r}
+lab.vector <- as.vector(t(imp.egfr))
+egfr.df <- data.frame(EGFR = lab.vector)
+```
+
+
+```{r}
+hmm.mod <- depmix(EGFR~1, data=egfr.df, nstates=3,
+    family=gaussian(), ntimes=rep(10, 1647))
+hmm.egfr <- fit(hmm.mod)
+dens.egfr <- depmixS4::forwardbackward(hmm.egfr)
+egfr.alpha <- as.data.frame(dens.egfr[["alpha"]])
+```
+
+```{r}
+# id <- c()
+# for (i in seq(1:1647)){
+#   id <- append(id, rep(i, 10))
+# }
+# egfr.alpha <- cbind(egfr.alpha, id=id)
+
+alpha.values <- as.vector(t(egfr.alpha))
+alpha.matrix <- matrix(alpha.values, nrow=1647, byrow = TRUE)
+```
+
+```{r}
+# ProbMatrix <- rbind(1:10/sum(1:10), 20:29/sum(20:29), 30:39/sum(30:39), 30:39/sum(30:39))
+distance.matrix <- philentropy::distance(alpha.matrix, method = "euclidean")
+pam.clust <- pam(distance.matrix, 5)
+View(pam.clust$medoids)
+View(pam.clust$clustering)
+cluster.results <- as.data.frame(pam.clust$clustering)
+colnames(cluster.results) <- c('group')
+table(cluster.results)
+fviz_cluster(pam.clust)
+```
+
+
+```{r}
+hmm.df <- data.frame(id=labs.cld@idFewNA, group=cluster.results)
+write_xlsx(hmm.df,"/Users/jinchenxie/Desktop/HF_Research/Weekly Progress/week 25/egfr_hmm_groups.xlsx")
+```
+
+```{r}
+cluster.results[cluster.results==1] <- 'A'
+cluster.results[cluster.results==2] <- 'B'
+cluster.results[cluster.results==3] <- 'C'
+cluster.results[cluster.results==4] <- 'D'
+cluster.results[cluster.results==5] <- 'E'
+
+cluster.hmm <- as.factor(cluster.results$group)
+part.2 <- partition(cluster.hmm)
+plotTrajMeans(longDataFrom3d(labs.ld, variable="EGFR"), part.2, xlab='Time', ylab='EGFR', parTraj=parTRAJ(type="n"), ylim=c(0, 100))
+```
+
+todo:
+- use 6 labs
+- use KL divergence for distance matrix instead of euclidean distance
+
+
+
+```{r}
+lab.temp <- labs %>% select(starts_with('PLATELETS_'))
+lab.vector <- as.vector(t(lab.temp))
+# labs.df <- data.frame(EGFR = lab.vector)
+labs.df <- cbind(labs.df, PLATELETS=lab.vector)
+```
+
+# Impute labs for forward-backward computation
+```{r}
+six.labs <- labs %>% select(starts_with('EGFR_'), starts_with('N_A_'), starts_with('K_'), starts_with('HGB_'), starts_with('WBC_'), starts_with('PLATELETS_'))
+imp.labs <- longitudinalData::imputation(as.matrix(six.labs), method='linearInterpol.locf')
+imp.labs <- imp.labs[complete.cases(imp.labs), ]
+```
+
+```{r}
+egfr.vector <- as.vector(t(imp.labs))
+egfr.df <- data.frame(EGFR = lab.vector)
+```
+
+
+```{r}
+hmm.mod <- depmix(EGFR~1, data=egfr.df, nstates=3,
+    family=gaussian(), ntimes=rep(10, 1647))
+hmm.egfr <- fit(hmm.mod)
+dens.egfr <- depmixS4::forwardbackward(hmm.egfr)
+egfr.alpha <- as.data.frame(dens.egfr[["alpha"]])
+```
+
+```{r}
+# id <- c()
+# for (i in seq(1:1647)){
+#   id <- append(id, rep(i, 10))
+# }
+# egfr.alpha <- cbind(egfr.alpha, id=id)
+
+alpha.values <- as.vector(t(egfr.alpha))
+alpha.matrix <- matrix(alpha.values, nrow=1647, byrow = TRUE)
+```
+
+```{r}
+# ProbMatrix <- rbind(1:10/sum(1:10), 20:29/sum(20:29), 30:39/sum(30:39), 30:39/sum(30:39))
+distance.matrix <- philentropy::distance(alpha.matrix, method = "Kullback-Leibler")
+pam.clust <- pam(distance.matrix, 5)
+View(pam.clust$medoids)
+View(pam.clust$clustering)
+cluster.results <- as.data.frame(pam.clust$clustering)
+colnames(cluster.results) <- c('group')
+table(cluster.results)
+fviz_cluster(pam.clust)
+```

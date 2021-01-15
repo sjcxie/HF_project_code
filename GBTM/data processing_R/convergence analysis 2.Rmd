@@ -1,0 +1,112 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+# library
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(echo=FALSE, warning=FALSE, message=FALSE)
+library(tidyverse)
+library(knitr)
+library(data.table)  #for transpose() function
+library(reshape2)
+library(openxlsx)
+# library(Hmisc)
+```
+
+
+```{r}
+multitraj.track <- readxl::read_excel("/Users/jinchenxie/Desktop/HF_Research/Weekly Progress/week 18/traj_results/multi_no_tcov.xlsx")
+egfr.track <- readxl::read_excel("/Users/jinchenxie/Desktop/HF_Research/Weekly Progress/week 18/traj_results/egfr_single.xlsx")
+```
+
+```{r}
+traj.gr.track <- egfr.track %>% select(`patients_id`, starts_with("_traj_Group"))
+traj.gr.track
+```
+
+# Group 1 patients
+
+```{r}
+gr1.conv <- c()
+gr2.conv <- c()
+gr3.conv <- c()
+gr4.conv <- c()
+gr5.conv <- c()
+```
+
+```{r}
+gr = 5
+traj.track.gr <- traj.gr.track[which(traj.gr.track$`_traj_Group`==gr),]
+gr.conv <- c()
+```
+
+
+```{r}
+temp <- traj.track.gr
+temp <- temp[which((temp$`_traj_Group_T1`==gr)&(temp$`_traj_Group_T2`==gr)&(temp$`_traj_Group_T3`==gr)&
+                     (temp$`_traj_Group_T4`==gr)&(temp$`_traj_Group_T5`==gr)&(temp$`_traj_Group_T6`==gr)&
+                     (temp$`_traj_Group_T7`==gr)&(temp$`_traj_Group_T8`==gr)&(temp$`_traj_Group_T9`==gr)),]
+gr.conv <- c(gr.conv, dim(temp)[1]/dim(traj.track.gr)[1])
+temp <- traj.track.gr
+temp <- temp[which((temp$`_traj_Group_T2`==gr)&(temp$`_traj_Group_T3`==gr)&
+                     (temp$`_traj_Group_T4`==gr)&(temp$`_traj_Group_T5`==gr)&(temp$`_traj_Group_T6`==gr)&
+                     (temp$`_traj_Group_T7`==gr)&(temp$`_traj_Group_T8`==gr)&(temp$`_traj_Group_T9`==gr)),]
+gr.conv <- c(gr.conv, dim(temp)[1]/dim(traj.track.gr)[1])
+temp <- traj.track.gr
+temp <- temp[which((temp$`_traj_Group_T3`==gr)&
+                     (temp$`_traj_Group_T4`==gr)&(temp$`_traj_Group_T5`==gr)&(temp$`_traj_Group_T6`==gr)&
+                     (temp$`_traj_Group_T7`==gr)&(temp$`_traj_Group_T8`==gr)&(temp$`_traj_Group_T9`==gr)),]
+gr.conv <- c(gr.conv, dim(temp)[1]/dim(traj.track.gr)[1])
+temp <- traj.track.gr
+temp <- temp[which((temp$`_traj_Group_T4`==gr)&(temp$`_traj_Group_T5`==gr)&(temp$`_traj_Group_T6`==gr)&
+                     (temp$`_traj_Group_T7`==gr)&(temp$`_traj_Group_T8`==gr)&(temp$`_traj_Group_T9`==gr)),]
+gr.conv <- c(gr.conv, dim(temp)[1]/dim(traj.track.gr)[1])
+temp <- traj.track.gr
+temp <- temp[which((temp$`_traj_Group_T5`==gr)&(temp$`_traj_Group_T6`==gr)&
+                     (temp$`_traj_Group_T7`==gr)&(temp$`_traj_Group_T8`==gr)&(temp$`_traj_Group_T9`==gr)),]
+gr.conv <- c(gr.conv, dim(temp)[1]/dim(traj.track.gr)[1])
+temp <- traj.track.gr
+temp <- temp[which((temp$`_traj_Group_T6`==gr)&
+                     (temp$`_traj_Group_T7`==gr)&(temp$`_traj_Group_T8`==gr)&(temp$`_traj_Group_T9`==gr)),]
+gr.conv <- c(gr.conv, dim(temp)[1]/dim(traj.track.gr)[1])
+temp <- traj.track.gr
+temp <- temp[which((temp$`_traj_Group_T7`==gr)&(temp$`_traj_Group_T8`==gr)&(temp$`_traj_Group_T9`==gr)),]
+gr.conv <- c(gr.conv, dim(temp)[1]/dim(traj.track.gr)[1])
+temp <- traj.track.gr
+temp <- temp[which((temp$`_traj_Group_T8`==gr)&(temp$`_traj_Group_T9`==gr)),]
+gr.conv <- c(gr.conv, dim(temp)[1]/dim(traj.track.gr)[1])
+temp <- traj.track.gr
+temp <- temp[which((temp$`_traj_Group_T9`==gr)),]
+gr.conv <- c(gr.conv, dim(temp)[1]/dim(traj.track.gr)[1])
+gr.conv <- c(gr.conv, dim(traj.track.gr)[1]/dim(traj.track.gr)[1])
+gr.conv
+
+```
+
+```{r}
+gr5.conv <- gr.conv
+```
+
+
+```{r}
+df.gr.conv <- as.data.frame(cbind(n = 1:10, gr1.conv, gr2.conv, gr3.conv, gr4.conv, gr5.conv))
+df.gr.conv
+```
+
+```{r}
+ggplot(df.gr.conv, aes(x=n)) + 
+  geom_line(aes(y = gr1.conv, color = "G1")) + 
+  
+  geom_line(aes(y = gr2.conv, color="G2")) + 
+  
+  geom_line(aes(y = gr3.conv, color="G3")) + 
+  
+  geom_line(aes(y = gr4.conv, color="G4")) + 
+  
+  geom_line(aes(y = gr5.conv, color="G5")) + 
+  scale_color_discrete(name = "Groups", labels = c("G1", "G2", "G3", "G4", "G5")) + scale_x_continuous(10) + ylab("% of patients converged to the final group assignment")
+
+ggsave("/Users/jinchenxie/Desktop/HF_Research/Weekly Progress/week 20/egfr traj convergence plot.png", width = 7, height = 4)
+```
+

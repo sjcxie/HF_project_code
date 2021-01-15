@@ -7,69 +7,86 @@ output: html_notebook
 knitr::opts_chunk$set(echo=FALSE, warning=FALSE, message=FALSE)
 library(tidyverse)
 library(knitr)
-library(readxl)
-library(openxlsx)
 library(data.table)
 library(Hmisc)
 library(arsenal)
-# library(survival)
-# library(survminer)
+library(survival)
+library(survminer)
 library(writexl)
 ```
 
-# Import data
-
+# import data
 ```{r}
-static.features <- read_excel("~/Desktop/datasets/processed/Static Characteristics.xlsx", sheet = 'static')
-baseline.df <- read_excel('~/Desktop/datasets/processed/Filtered Baseline imputed.xlsx', sheet = 'Sheet 1')
-admission.df <- read_excel("/Users/jinchenxie/Desktop/datasets/processed/Filtered Attributes Admission v2.xlsx", sheet = 'NA30_filtered_admission')
-# baseline.raw <- read_excel('/Users/jinchenxie/Desktop/datasets/processed/Filtered Attributes Baseline.xlsx', sheet = 'NA30_filtered_baseline')
-series.df <- read_excel('~/Desktop/datasets/processed/GBTM_data/combined gbtm stata data v2.xlsx', sheet = 'Sheet 1')
-# admission.raw <- read_excel('/Users/jinchenxie/Desktop/datasets/HF-Admissions.xlsx', sheet = '00480_Admissions_20200115_NA')
-```
-
-**patient 9597 has POST_VAD ==1 in baseline. We modified admission to match baseline record.**
-```{r}
-admission.df[which((admission.df$rID == 9597)&(admission.df$last_adm==1)),]$POST_VAD <- 1
-```
-
-
-```{r}
-rid <- series.df$patients_id
-```
-
-**We want to profile these 1468 patients together first.**
-
-# Save the FULL cohort baseline and admission
-
-Full cohort: 1558 patients
-
-```{r}
-baseline.sub <- baseline.df[which(baseline.df$rID %in% rid),]
-static.sub <- static.features[which(static.features$rID %in% rid),]
-static.sub <- static.sub[,-c(1)]
-static.sub <- static.sub %>% select(-FEMALE, -starts_with("HX_"), -ends_with("_HST"), -starts_with("CCI_"), -ends_with("_CARDIOMYOPATHY"))
-names(static.sub)[names(static.sub) == "AGE_ADMISSION"] <- "Normalized_Age"
-full.baseline <- cbind(baseline.sub, static.sub)
-
-admission.sub <- admission.df[which(admission.df$rID %in% rid),]
-```
-
-
-```{r}
-list.df <- list("baseline" = full.baseline, "admission" = admission.sub)
-write.xlsx(list.df, '~/Desktop/datasets/processed/GBTM_data/gbtm Cohort data combined.xlsx', col.names = TRUE, row.names = FALSE)
+baseline.profile.df <- readxl::read_excel("/Users/jinchenxie/Desktop/HF_Research/datasets/processed/All Baseline Attributes combined.xlsx", sheet = 'Sheet 1')
+# baseline.df <- read_excel('~/Desktop/datasets/processed/GBTM_data/Filtered Baseline imputed.xlsx', sheet = 'Sheet 1')
+admission_30NA <- readxl::read_excel("~/Desktop/HF_Research/datasets/processed/Filtered Attributes Admission v2.xlsx", sheet = 'Sheet 1')
+# static.features <- read_excel("~/Desktop/datasets/processed/Static Characteristics.xlsx", sheet = 'static')
 ```
 
 # Profiling
 
 ```{r}
-df <- read_excel("~/Desktop/trial save.xlsx", sheet="Sheet1")
+attris.df <- baseline.profile.df %>% select("rID", "AGE_ADMISSION", "FEMALE", "RACE_White", starts_with("TOBACCO_"), starts_with("INSUR_"), starts_with("BP_"), "PULSE", "BMI", ends_with("_HST"), starts_with("HX_"), starts_with("PRIOR_"),  "CCI_TOTAL_SCORE", starts_with("CCI_"), starts_with("POST_"), ends_with("_CARDIOMYOPATHY"), ends_with("_00"), "CTB", ends_with("_CTB"), total_adms, Corrected_Followup_Days)
+attris.df$TOBACCO_STATUS_LABEL <- NULL
+nu.list <- c("AGE_ADMISSION", "CCI_TOTAL_SCORE", "BP_SYSTOLIC", "BP_DIASTOLIC", "PULSE", "BMI", "total_adms", "Corrected_Followup_Days")
+binary.list <- colnames(attris.df)[-1]
+binary.list <- binary.list[!binary.list %in% nu.list]
 
-baseline.data <- cbind(full.baseline, admission.relevant, df$`_traj_Group`)
+list.attris <- c(nu.list, binary.list)
+```
+
+
+## groups profiling
+```{r}
+df <- readxl::read_excel("/Users/jinchenxie/Desktop/HF_Research/Weekly Progress/week 18/traj_results/multi_nofac_notcov.xlsx")
+
+baseline.sub <- baseline.profile.df[which(baseline.profile.df$rID %in% df$patients_id),]
+
+temp.1 <- baseline.sub %>% select(nu.list)
+temp.2 <- baseline.sub %>% select(binary.list)
+# converting all columns into categorical variables
+temp.2[,names(temp.2)] <- lapply(temp.2[,names(temp.2)], factor) 
+temp <- cbind(temp.1, temp.2)
+
+temp <- cbind(temp, df$`_traj_Group`)
+names(temp)[names(temp) == "df$`_traj_Group`"] <- "Group"
+
+mycontrols  <- tableby.control(test=TRUE, cat.test="chisq")
+table.1 <- tableby(Group ~ ., data = temp, control = mycontrols)
+summary(table.1)
+temp.tab <- as.data.frame(summary(table.1))
+temp.tab <- temp.tab[-which(temp.tab[,1]=="&nbsp;&nbsp;&nbsp;Range"),]
+temp.tab[which(temp.tab[,1]=="&nbsp;&nbsp;&nbsp;Mean (SD)"), 1] <- "Mean (SD)"
+temp.tab[which(temp.tab[,1]=="&nbsp;&nbsp;&nbsp;0"), 1] <- "0"
+temp.tab[which(temp.tab[,1]=="&nbsp;&nbsp;&nbsp;1"), 1] <- "1"
+View(temp.tab)
+# tests(table.1)
+rm(temp.1, temp.2)
+temp.tab.filtered <- temp.tab[which((temp.tab$`p value` <= 0.05)|(temp.tab$`p value`=="< 0.001")),]
+View(temp.tab.filtered)
+```
+
+```{r}
+write_xlsx(temp.tab.filtered,"/Users/jinchenxie/Desktop/HF_Research/Weekly Progress/week 18/multi_nofac_alltcov_chara.xlsx")
+```
+
+
+```{r eval=FALSE}
+
+df <- readxl::read_excel("~/Desktop/trial save.xlsx", sheet="Sheet1")
+
+baseline.sub <- baseline.profile.df[which(baseline.profile.df$rID %in% df$patients_id),]
+baseline.data <- cbind(baseline.sub, df$`_traj_Group`)
 names(baseline.data)[names(baseline.data) == "df$`_traj_Group`"] <- "Group"
 
+# baseline.data[binary.list] <- lapply(baseline.data[binary.list], as.factor)
+# baseline.data[nu.list] <- sapply(baseline.data[nu.list], as.numeric)
+
 temp <- baseline.data %>% select(Group, list.attris)
+# temp <- temp[which(temp$Group %in% c(1, 3)),]
+
+
+mycontrols  <- tableby.control(test=TRUE, cat.test="chisq")
 
 table.1 <- tableby(Group ~ ., data = temp)
 summary(table.1)
@@ -78,105 +95,140 @@ temp.tab <- as.data.frame(summary(table.1))
 # rename first column
 
 temp.tab <- temp.tab[-which(temp.tab[,1]=="&nbsp;&nbsp;&nbsp;Range"),]
-temp.tab <- temp.tab[-which(temp.tab[,1]=="&nbsp;&nbsp;&nbsp;Mean (SD)"),]
+# temp.tab <- temp.tab[-which(temp.tab[,1]=="&nbsp;&nbsp;&nbsp;N-Miss"),]
 
-temp.tab.filtered <- temp.tab[which(temp.tab$`p value` <= 0.05),]
-temp.tab.filtered <- temp.tab.filtered[-which(as.character(temp.tab.filtered$`p value`)==" NaN"),]
+temp.tab[which(temp.tab[,1]=="&nbsp;&nbsp;&nbsp;Mean (SD)"), 1] <- "Mean (SD)"
+# temp.tab <- temp.tab[-which(temp.tab[,1]=="&nbsp;&nbsp;&nbsp;Mean (SD)"),]
+
+# write_xlsx(temp.tab,"~/Desktop/temp.xlsx")
+
+
+temp.tab.filtered <- temp.tab[which((temp.tab$`p value` <= 0.05)|(temp.tab$`p value`=="< 0.001")),]
+# temp.tab.filtered <- temp.tab.filtered[-which(as.character(temp.tab.filtered$`p value`)==" NaN"),]
 
 View(temp.tab.filtered)
 # temp.tab[which(temp.tab[,1]=="&nbsp;&nbsp;&nbsp;Mean (SD)"), 1] <- "Mean (SD)"
-# write_xlsx(temp.tab,"~/Desktop/temp.xlsx")
-```
-
-
-# CTB label
-
-
-```{r}
-temp <- full.baseline %>% select(list.attris[1:96])
-
-table.1 <- tableby(`CTB` ~ ., data = temp)
-summary(table.1)
-temp.tab <- as.data.frame(summary(table.1))
-
-temp.tab <- temp.tab[-which(temp.tab[,1]=="&nbsp;&nbsp;&nbsp;Range"),]
-temp.tab[which(temp.tab[,1]=="&nbsp;&nbsp;&nbsp;Mean (SD)"), 1] <- "Mean (SD)"
-View(temp.tab)
-
-# write_xlsx(temp.tab,"~/Desktop/temp.xlsx")
-
+# write_xlsx(temp.tab.filtered,"~/Desktop/temp.xlsx")
+# tests(table.1)
 ```
 
 
 
-# 30_day_CTB label
 
-```{r}
-baseline.30ctb.1 <- baseline.sub[which(baseline.sub$`30_day_CTB` ==1),]
-baseline.30ctb.0 <- baseline.sub[which(baseline.sub$`30_day_CTB` ==0),]
-
-dim(baseline.30ctb.1)[1]/dim(baseline.sub)[1]
-
-static.30ctb.1 <- static.features[which(static.features$rID %in% baseline.30ctb.1$rID),]
-static.30ctb.0 <- static.features[which(static.features$rID %in% baseline.30ctb.0$rID),]
+```{r extract_sig_attris function}
+extract_sig_attris <- function(p.value.tbl){
+  attris.list <- c()
+  list <- p.value.tbl[,1][-which(p.value.tbl[,1]=="Mean (SD)")]
+  for (attri in list){
+    attris.list <- c(attris.list, substr(attri, 3, nchar(attri)-2))
+  }
+  return(attris.list)
+}
 ```
 
 ```{r}
-summary(baseline.30ctb.0$AGE_ADMISSION)
-summary(baseline.30ctb.1$AGE_ADMISSION)
-
-static.30ctb.0 %>% select(RACE_White, FEMALE, starts_with("TOBACCO_"), starts_with("INSUR_")) %>% summary()
-baseline.30ctb.0 %>% select(POST_CRT, POST_VAD, POST_TRANSPLANT) %>% summary()
-```
-
-
-# POST_VAD, POST_TRANSPLANT label
-
-```{r}
-summary(baseline.sub[which(baseline.sub$POST_TRANSPLANT==1),]$AGE_ADMISSION)
+sig.list <- extract_sig_attris(temp.tab.filtered)
 ```
 
 
 
-```{r}
-temp <- baseline.sub %>% select(POST_TRANSPLANT,  ends_with("_HST"), starts_with("HX_"))
 
-table.1 <- tableby(POST_TRANSPLANT ~ ., data = temp)
-summary(table.1)
-```
-
-```{r}
-mean(baseline.raw$BMI, na.rm = TRUE)
-mean(baseline.df$BMI)
-mean(baseline.sub$BMI)
-
-
-mean(baseline.raw$PULSE, na.rm = TRUE)
-mean(baseline.df$PULSE)
-mean(baseline.sub$PULSE)
-```
-
-```{r}
-baseline.sub %>%  select(BP_SYSTOLIC, BP_DIASTOLIC, PULSE) %>% 
-  summary()
-baseline.sub[which(baseline.sub$CTB==1),] %>% select(BP_SYSTOLIC, BP_DIASTOLIC, PULSE) %>% 
-  summary()
-```
 
 # Kaplan Meier Curve
 ```{r}
-admission.raw.sub <- admission.raw[which(admission.raw$rID %in% baseline.sub$rID),] %>% select(rID, AGE_ADMISSION)
+admission.sub <- admission_30NA[which(admission_30NA$rID %in% baseline.sub$rID),] %>% select(rID, AGE_ADMISSION)
 kapm.df <- baseline.sub %>% select(rID, Corrected_Followup_Days, CTB, POST_VAD, POST_TRANSPLANT)
+# add the univariate EGFR group info
+# kapm.df <- cbind(kapm.df, ctb.gr.df$group_egfr)
+# names(kapm.df)[names(kapm.df) == "ctb.gr.df$group_egfr"] <- "group_egfr"
+# add the univariate Sodium group info
+kapm.df <- cbind(kapm.df, df$`_traj_Group`)
+names(kapm.df)[names(kapm.df) == "df$`_traj_Group`"] <- "group_multivar"
+```
 
+
+```{r}
 surv_object <- Surv(time = kapm.df$Corrected_Followup_Days, event = kapm.df$CTB)
-fit1 <- survfit(surv_object ~ POST_VAD, data = kapm.df)
-fit2 <-  survfit(surv_object ~ POST_TRANSPLANT, data = kapm.df)
+# fit1 <- survfit(surv_object ~ POST_VAD, data = kapm.df)
+# fit2 <-  survfit(surv_object ~ group_egfr, data = kapm.df)
+fit3 <-  survfit(surv_object ~ group_multivar, data = kapm.df)
+```
+
+
+```{r}
+# survminer::ggsurvplot(fit1, data = kapm.df, pva1 = TRUE, xlab = "Follow up days")
+# survminer::ggsurvplot(fit2, data = kapm.df, pva1 = TRUE, xlab = "Follow up days")
+survminer::ggsurvplot(fit3, data = kapm.df, pva1 = TRUE, xlab = "Follow up days")
+ggsave("/Users/jinchenxie/Desktop/HF_Research/Weekly Progress/week 18/multi_traj KM plot2.png", width = 7, height = 5)
+```
+
+
+
+```{r}
+temp.baseline <- cbind(baseline.sub[which(baseline.sub$rID %in% ids),], INTER = group.1.inter$POST_INTER)
+
+kapm.df <- temp.baseline %>% select(rID, Corrected_Followup_Days, CTB, INTER)
+surv_object <- Surv(time = kapm.df$Corrected_Followup_Days, event = kapm.df$CTB)
+fit <-  survfit(surv_object ~ INTER, data = kapm.df)
+survminer::ggsurvplot(fit, data = kapm.df, pva1 = TRUE, xlab = "Follow up days")
+ggsave("/Users/jinchenxie/Desktop/HF_Research/Weekly Progress/week 20/inter KM plot5.png", width = 7, height = 5)
+```
+
+
+# CTB Profiling**
+```{r}
+df <- readxl::read_excel("/Users/jinchenxie/Desktop/HF_Research/Weekly Progress/week 18/egfr_single.xlsx")
+
+baseline.sub <- baseline.profile.df[which(baseline.profile.df$rID %in% df$patients_id),]
+baseline.data <- cbind(baseline.sub, df$`_traj_Group`)
+
+
+temp.1 <- baseline.data %>% select(nu.list)
+temp.2 <- baseline.data %>% select(binary.list)
+
+# converting all columns into categorical variables
+temp.2[,names(temp.2)] <- lapply(temp.2[,names(temp.2)], factor) 
+temp <- cbind(temp.1, temp.2)
+mycontrols  <- tableby.control(test=TRUE, cat.test="chisq")
+table.1 <- tableby(CTB ~ ., data = temp, control = mycontrols)
+summary(table.1)
+temp.tab <- as.data.frame(summary(table.1))
+temp.tab <- temp.tab[-which(temp.tab[,1]=="&nbsp;&nbsp;&nbsp;Range"),]
+temp.tab[which(temp.tab[,1]=="&nbsp;&nbsp;&nbsp;Mean (SD)"), 1] <- "Mean (SD)"
+temp.tab[which(temp.tab[,1]=="&nbsp;&nbsp;&nbsp;0"), 1] <- "0"
+temp.tab[which(temp.tab[,1]=="&nbsp;&nbsp;&nbsp;1"), 1] <- "1"
+tests(table.1)
+rm(temp.1, temp.2)
 ```
 
 ```{r}
-survminer::ggsurvplot(fit1, data = kapm.df, pva1 = TRUE, xlab = "Follow up days")
-survminer::ggsurvplot(fit2, data = kapm.df, pva1 = TRUE, xlab = "Follow up days")
+write_xlsx(temp.tab,"/Users/jinchenxie/Desktop/HF_Research/Weekly Progress/week 18/egfr_single_chara.xlsx")
 ```
+
+## 30-day CTB profilng
+```{r}
+temp.1 <- baseline.data %>% select(nu.list)
+temp.2 <- baseline.data %>% select(binary.list)
+# converting all columns into categorical variables
+temp.2[,names(temp.2)] <- lapply(temp.2[,names(temp.2)] , factor) 
+temp <- cbind(temp.1, temp.2)
+mycontrols  <- tableby.control(test=TRUE, cat.test="chisq")
+table.1 <- tableby(`30_day_CTB`~., data = temp, control = mycontrols)
+# summary(table.1)
+tests(table.1)
+temp.tab <- as.data.frame(summary(table.1))
+temp.tab <- temp.tab[-which(temp.tab[,1]=="&nbsp;&nbsp;&nbsp;Range"),]
+temp.tab[which(temp.tab[,1]=="&nbsp;&nbsp;&nbsp;Mean (SD)"), 1] <- "Mean (SD)"
+temp.tab[which(temp.tab[,1]=="&nbsp;&nbsp;&nbsp;0"), 1] <- "0"
+temp.tab[which(temp.tab[,1]=="&nbsp;&nbsp;&nbsp;1"), 1] <- "1"
+rm(temp.1, temp.2)
+```
+
+```{r}
+write_xlsx(temp.tab,"~/Desktop/temp.xlsx")
+```
+
+
 
 ```{r}
 dim(admission.df)
@@ -190,4 +242,137 @@ write_xlsx(temp1,"~/Desktop/temp.xlsx")
 ```
 
 
+# Post Procedure Timing
+```{r}
+df <- readxl::read_excel("/Users/jinchenxie/Desktop/HF_Research/Weekly Progress/week 18/traj_results/multi_no_tcov.xlsx") %>% select(patients_id, `_traj_Group`)
+admission_30NA <- readxl::read_excel("~/Desktop/HF_research/datasets/processed/Filtered Attributes Admission v2.xlsx", sheet = 'Sheet 1')
+admission.relevant <- admission_30NA %>% select(rID, POST_TRANSPLANT, POST_VAD, admission_count, READMISSION_DAYS)
+
+groups <- sort(unique(df$`_traj_Group`))
+pat.membership <- vector(mode="list", length = length(groups))
+for (group in groups){
+  pat.membership[[group]] <- df$patients_id[which(df$`_traj_Group`==group)]
+}
+
+admission.relevant[is.na(admission.relevant$READMISSION_DAYS),]$READMISSION_DAYS <- 0
+```
+
+**We only count the admission of each patient's first VAD and heart transplant. **
+```{r proc_adm_ave functions}
+proc_adm_ave <- function(procedure, group.membership, admission.relevant){
+  group.adm.mean <- c()
+  group.adm.std <- c()
+  for (group in groups){
+    adm.count.list <- c()
+    temp_pats <- admission.relevant[which((admission.relevant$rID %in% group.membership[[group]]) & (admission.relevant[procedure] == 1)),]
+    for (id in unique(temp_pats$rID)){
+      temp.pat <- temp_pats[which(temp_pats$rID == id),]
+      adm.count.list <- c(adm.count.list, as.numeric(temp.pat[1, "admission_count"]))
+    }
+    cat("n: ", length(adm.count.list), "\n")
+    group.adm.mean <- c(group.adm.mean, mean(adm.count.list))
+    group.adm.std <- c(group.adm.std, sd(adm.count.list))
+  }
+  print("means:")
+  print(group.adm.mean)
+  print("sd:")
+  print(group.adm.std)
+  return
+}
+
+proc_days_ave <- function(procedure, group.membership, admission.relevant){
+  group.adm.mean <- c()
+  group.adm.std <- c()
+  for (group in groups){
+    adm.count.list <- c()
+    temp_pats <- admission.relevant[which((admission.relevant$rID %in% group.membership[[group]]) & (admission.relevant[procedure] == 1)),]
+    for (id in unique(temp_pats$rID)){
+      temp.pat <- temp_pats[which(temp_pats$rID == id),]
+      adm.count.list <- c(adm.count.list, as.numeric(temp.pat[1, "READMISSION_DAYS"]))
+    }
+    cat("n: ", length(adm.count.list), "\n")
+    group.adm.mean <- c(group.adm.mean, mean(adm.count.list))
+    group.adm.std <- c(group.adm.std, sd(adm.count.list))
+  }
+  print("means:")
+  print(group.adm.mean)
+  print("sd:")
+  print(group.adm.std)
+  return
+}
+
+
+proc_ctb_adm_ave <- function(procedure, group.membership, admission.relevant, baseline.profile.df, CTB_state){
+  group.adm.mean <- c()
+  group.adm.std <- c()
+  for (group in groups){
+    adm.count.list <- c()
+    ctb.satisfied <- baseline.profile.df[which(baseline.profile.df$CTB == CTB_state),]$rID
+    temp_pats <- admission.relevant[which((admission.relevant$rID %in% group.membership[[group]]) & (admission.relevant[procedure] == 1) & (admission.relevant$rID %in% ctb.satisfied)),]
+    for (id in unique(temp_pats$rID)){
+      temp.pat <- temp_pats[which(temp_pats$rID == id),]
+      adm.count.list <- c(adm.count.list, as.numeric(temp.pat[1, "admission_count"]))
+    }
+    cat("n: ", length(adm.count.list), "\n")
+    group.adm.mean <- c(group.adm.mean, mean(adm.count.list))
+    group.adm.std <- c(group.adm.std, sd(adm.count.list))
+  }
+  return(group.adm.mean)
+}
+```
+
+```{r}
+# proc_adm_ave("POST_VAD", pat.membership, admission.relevant)
+# proc_adm_ave("POST_TRANSPLANT", pat.membership, admission.relevant)
+# proc_ctb_adm_ave("POST_VAD", pat.membership, admission.relevant, baseline.profile.df, 1)
+# proc_ctb_adm_ave("POST_VAD", pat.membership, admission.relevant, baseline.profile.df, 0)
+proc_days_ave("POST_VAD", pat.membership, admission.relevant)
+proc_days_ave("POST_TRANSPLANT", pat.membership, admission.relevant)
+```
+
+# Time span of the admissions we modeled
+
+```{r}
+admission_trunc <- admission_30NA[which((admission_30NA$admission_count <= 10)&(admission_30NA$rID %in% df$patients_id)),]
+
+summary(admission_trunc$READMISSION_DAYS)
+```
+
+# Data Availability
+```{r}
+input <- readxl::read_excel("/Users/jinchenxie/Desktop/HF_Research/datasets/processed/GBTM_data/labs_labels_tvarycov.xlsx")
+
+sapply(input, function(x) (1-sum(is.na(x))/1653)*100)
+```
+
+
+# K-Means group profiling
+```{r}
+df <- traj.compare.df
+
+baseline.sub <- baseline.profile.df[which(baseline.profile.df$rID %in% df$id),]
+
+temp.1 <- baseline.sub %>% select(nu.list)
+temp.2 <- baseline.sub %>% select(binary.list)
+# converting all columns into categorical variables
+temp.2[,names(temp.2)] <- lapply(temp.2[,names(temp.2)], factor) 
+temp <- cbind(temp.1, temp.2)
+
+temp <- cbind(temp, df$`kmeans`)
+names(temp)[names(temp) == "df$kmeans"] <- "Group"
+
+mycontrols  <- tableby.control(test=TRUE, cat.test="chisq")
+table.1 <- tableby(Group ~ ., data = temp, control = mycontrols)
+summary(table.1)
+temp.tab <- as.data.frame(summary(table.1))
+temp.tab <- temp.tab[-which(temp.tab[,1]=="&nbsp;&nbsp;&nbsp;Range"),]
+temp.tab[which(temp.tab[,1]=="&nbsp;&nbsp;&nbsp;Mean (SD)"), 1] <- "Mean (SD)"
+temp.tab[which(temp.tab[,1]=="&nbsp;&nbsp;&nbsp;0"), 1] <- "0"
+temp.tab[which(temp.tab[,1]=="&nbsp;&nbsp;&nbsp;1"), 1] <- "1"
+View(temp.tab)
+# tests(table.1)
+rm(temp.1, temp.2)
+temp.tab.filtered <- temp.tab[which((temp.tab$`p value` <= 0.05)|(temp.tab$`p value`=="< 0.001")),]
+View(temp.tab.filtered)
+```
 
